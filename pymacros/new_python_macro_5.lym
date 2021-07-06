@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+options = {'layers':[0,1,2], 'etch_frame_um':1, 'frame_mode':5, 'folder_path':"C:/Users/sz1x3/Google Drive/EE MSc/KLayout/GDS/Dor"}
+
+layout0 = pya.CellView.active().layout()
+et = int(round(cap_frame/layout0.dbu))
+layout = Layout()
+top = layout.create_cell("TOP")
+for l in layers:
+  find_l = layout0.find_layer(l,0)
+  if find_l is not None:
+    layer = layout.layer(l, 0)
+    region0 = Region(layout0.begin_shapes(layout0.top_cell(), find_l))
+    region = region0.dup()
+    region.size(et,frame_mode)
+    region.merge()
+    region_final = region-region0
+    region_final.merge()
+    top.shapes(layer).insert(region_final)
+layout.write(dpath + "/" + "_L="+str(options['layers'])+"frame="+str(options['etch_frame_um'])+".gds")
+
+
+
+</text>
+</klayout-macro>

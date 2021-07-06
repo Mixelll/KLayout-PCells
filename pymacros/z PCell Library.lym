@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+
+
+class PCellLib(pya.Library):
+
+  def __init__(self):
+  
+    # TODO: change the description
+ #   self.description = "My PCell library"
+#    self.layout().register_pcell("Graphene_Schottky_3", Graphene_Schottky_3())
+#    self.layout().register_pcell("Graphene_Schottky_4", Graphene_Schottky_4())
+#    self.layout().register_pcell("Graphene_Schottky_5", Graphene_Schottky_5())
+    self.layout().register_pcell("Graphene_Schottky_6", Graphene_Schottky_6())
+    self.layout().register_pcell("Hall_bar", Hall_bar())
+    self.layout().register_pcell("BOX", BOX())
+    self.layout().register_pcell("Box_array", Box_array())
+    self.layout().register_pcell("Circle_array", Circle_array())
+    self.layout().register_pcell("Circle_sized", Circle_sized())
+    self.layout().register_pcell("TRAPEZOID", TRAPEZOID())
+    self.layout().register_pcell("TRAPEZOID_singleLayer", TRAPEZOID_singleLayer())
+#    self.layout().register_pcell("Contact", Contact())
+    self.layout().register_pcell("Aligment_mark", Aligment_mark())
+    self.layout().register_pcell("Numbering", Numbering())
+    self.layout().register_pcell("Mask_naming", Mask_naming())
+    self.layout().register_pcell("Text", Textt())
+    self.layout().register_pcell("Graphene_Schottky_comb", Graphene_Schottky_comb())
+    self.layout().register_pcell("Graphene_Schottky_2T_spiral", Graphene_Schottky_2T_spiral())
+#    self.layout().register_pcell("dor_GC", dor_GC())
+#   self.layout().register_pcell("dor_GC_arc", dor_GC_arc())
+#    self.layout().register_pcell("dor_MMI", dor_MMI())
+    self.layout().register_pcell("Chess", Chess())
+    self.layout().register_pcell("Frame", Frame())
+    self.layout().register_pcell("Number_array", Number_array())
+    self.layout().register_pcell("GrSchott_try", GrSchott_try())
+    self.layout().register_pcell("Numbering_all", Numbering_all())
+    # register our library with the name "PCellLib"
+    self.register("PCellLib")
+    
+# instantiate and register the library
+# TODO: change the library name
+PCellLib()
+</text>
+</klayout-macro>

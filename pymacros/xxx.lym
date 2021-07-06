@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+rega = pya.Region()
+regb = pya.Region()
+
+
+rega.insert(pya.DBox(pya.DPoint(0,0), pya.DPoint(-100,-100)))
+rega.separation_check(regb, 30)
+regb.insert(pya.DBox(pya.DPoint(1000,1000), pya.DPoint(2000,2000)))
+if not rega.separation_check(regb, 10):
+  print(5)
+  
+
+
+
+</text>
+</klayout-macro>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text># Python version: 3.7
+
+import pya
+dpath = "C:/Users/Mixel/Google Drive/EE MSc/KLayout/"
+dier = 400
+
+oxr1 = 100
+oxgap = 100
+oxr2 = 50
+m1_l = 200
+oxrga = oxr1 + oxgap
+oxrp = oxrga + oxr2
+
+gr_inner = oxr1 + oxgap/2
+
+m2_over_gr = 10
+m2_over_ox = 20
+m2_l = 100
+
+layout = pya.Layout()
+top = layout.create_cell("TOP")
+
+#lo.layer = layout.layer(1, 0)
+#lm1.layer = layout.layer(2, 0)
+#lg.layer = layout.layer(3, 0)
+#lm2.layer = layout.layer(4, 0)
+
+lo = pya.LayerInfo(0, 0)
+lm1 = pya.LayerInfo(1, 0)
+lg = pya.LayerInfo(2, 0)
+lm2 = pya.LayerInfo(3, 0)
+
+
+
+# Oxide
+top.shapes(lo.layer).insert(pya.Box(-oxr1, -oxr1, oxr1, oxr1))
+
+polym1 = pya.Polygon([pya.Point(-oxrp, -oxrp) , pya.Point(-oxrp, oxrp), pya.Point(oxrp, oxrp), pya.Point(oxrp, -oxrp)], False)
+polym1.insert_hole([pya.Point(-oxrga, -oxrga) , pya.Point(oxrga, -oxrga), pya.Point(oxrga, oxrga), pya.Point(-oxrga, oxrga)], False)
+
+#top.shapes(lo.layer).insert(polym1)
+top.shapes(lo.layer).insert(pya.Box(-oxrp -oxr2, -m1_l, -oxrp , +m1_l))
+top.shapes(lo.layer).insert(pya.Box(oxrp , -m1_l, oxrp +oxr2, +m1_l))
+top.shapes(lo.layer).insert(pya.Box(-m1_l, oxrp, +m1_l, oxrp +oxr2))
+top.shapes(lo.layer).insert(pya.Box(-m1_l, -oxrp -oxr2, +m1_l, -oxrp))
+
+layout.create_cell("TXT('aa')", "Basic")
+top.shapes(lo.layer).insert(pya.Box(-m1_l, -oxrp -oxr2, +m1_l, -oxrp))
+
+
+
+# Si contact
+#top.shapes(lm1.layer).insert(polym1)
+top.shapes(lm1.layer).insert(pya.Box(-oxrp -oxr2, -m1_l, -oxrp , +m1_l))
+top.shapes(lm1.layer).insert(pya.Box(oxrp , -m1_l, oxrp +oxr2, +m1_l))
+top.shapes(lm1.layer).insert(pya.Box(-m1_l, oxrp, +m1_l, oxrp +oxr2))
+top.shapes(lm1.layer).insert(pya.Box(-m1_l, -oxrp -oxr2, +m1_l, -oxrp))
+
+
+# Graphene pattern
+polyg = pya.Polygon([pya.Point(-dier, -dier) , pya.Point(-dier, dier), pya.Point(dier, dier), pya.Point(dier, -dier)], False)
+polyg.insert_hole([pya.Point(-gr_inner, -gr_inner) , pya.Point(gr_inner, -gr_inner), pya.Point(gr_inner, gr_inner), pya.Point(-gr_inner, gr_inner)], False)
+top.shapes(lg.layer).insert(polyg)
+
+# Graphene contact
+top.shapes(lm2.layer).insert(pya.Box(-gr_inner -m2_over_ox, -m2_l, -gr_inner +m2_over_gr, +m2_l))
+top.shapes(lm2.layer).insert(pya.Box(gr_inner -m2_over_gr, -m2_l, gr_inner +m2_over_ox, +m2_l))
+top.shapes(lm2.layer).insert(pya.Box(-m2_l, gr_inner -m2_over_gr, +m2_l, gr_inner +m2_over_ox))
+top.shapes(lm2.layer).insert(pya.Box(-m2_l, -gr_inner -m2_over_ox, +m2_l, -gr_inner +m2_over_gr))
+
+layout.write(dpath + "t.gds")
+
+
+</text>
+</klayout-macro>

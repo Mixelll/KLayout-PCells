@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from pya import *
+import math
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Number_array(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Number_array, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("layers", self.TypeList, "layers", default =[0])
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default =3)
+    self.param("right_to_left", self.TypeBoolean, "Check for right to left, uncheck for top to bottom", default =True)
+    self.param("N_x", self.TypeInt, "N columns", default =1)
+    self.param("N_y", self.TypeInt, "N rows", default =1)
+    self.param("x_d", self.TypeInt, "Column increment", default =100)
+    self.param("y_d", self.TypeInt, "Row increment", default =100)
+    self.param("n0", self.TypeInt, "First number", default =1)
+    self.param("nd", self.TypeInt, "Number Increment", default =1)
+    self.param("x_arr_b", self.TypeBoolean, "Columns - check for array of increments", default =False)
+    self.param("x_arr", self.TypeList, "Columns array of increments", default =[])
+    self.param("y_arr_b", self.TypeBoolean, "Rows - check for array of increments", default =False)
+    self.param("y_arr", self.TypeList, "Rows array of increments", default =[])
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Number_array"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    def text_write(text, loc):
+      text_param = {'text': text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+      text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+      #text_dbox = lay.create_cell("TEXT", "Basic", text_param).dbbox()
+      text_shapes.transform(pya.DTrans(loc.x, loc.y))
+      for l_string in self.layers:
+        l = self.layout.layer(int(l_string), 0)
+        self.cell.shapes(l).insert(text_shapes)
+
+    lay = pya.Layout()
+    text_layer = lay.layer(0, 0)
+    text_layer_info = pya.LayerInfo(0, 0)
+    
+    nd = self.nd
+    N_x = self.N_x
+    N_y = self.N_y
+    x_d = self.x_d
+    y_d = self.y_d
+    x_arr = self.x_arr
+    y_arr = self.y_arr
+    if x_arr[0]=='':
+      x_arr=['0']
+    if y_arr[0]=='':
+      y_arr=['0']
+    if int(x_arr[0])!=0:
+      x_arr.insert(0,'0')
+    if int(y_arr[0])!=0:
+      y_arr.insert(0,'0')
+    
+    xt = 0
+    yt = 0
+    i=self.n0
+    if self.right_to_left:
+    
+      if not self.x_arr_b and not self.y_arr_b:
+        for y in range(0, N_y):
+          for x in range(0, N_x):
+            text_write(str(i), DPoint(x*x_d, -y*y_d))
+            i+=nd
+      elif self.x_arr_b and not self.y_arr_b:
+        for y in range(0, N_y):
+          for x in x_arr:
+            xt+= float(x)
+            text_write(str(i), DPoint(xt, -y*y_d))
+            i+=nd
+      elif not self.x_arr_b and self.y_arr_b:
+        for y in y_arr:
+          yt+= float(y)
+          for x in range(0, N_x):
+            text_write(str(i), DPoint(x*x_d, -yt))
+            i+=nd
+      else:
+        for y in y_arr:
+          yt+= float(y)
+          for x in x_arr:
+            xt+= float(x)
+            text_write(str(i), DPoint(xt, -yt))
+            i+=nd
+                         
+    else:
+      
+      if not self.x_arr_b and not self.y_arr_b:
+        for x in range(0, N_x):
+          for y in range(0, N_y):
+            text_write(str(i), DPoint(x*x_d, -y*y_d))
+            i+=nd
+      elif self.x_arr_b and not self.y_arr_b:
+        for x in x_arr:
+          xt+= float(x)
+          for y in range(0, N_y):
+            text_write(str(i), DPoint(xt, -y*y_d))
+            i+=nd
+      elif not self.x_arr_b and self.y_arr_b:
+        for x in range(0, N_x):
+          for y in y_arr:
+            yt+= float(y)
+            text_write(str(i), DPoint(x*x_d, -yt))
+            i+=nd
+      else:
+        for x in x_arr:
+          xt+= float(x)
+          for y in y_arr:
+            yt+= float(y)
+            text_write(str(i), DPoint(xt, -yt))
+            i+=nd
+    dbox = self.cell.dbbox()
+    self.cell.transform_into(DTrans(-dbox.left, -dbox.bottom))
+    
+    
+  
+</text>
+</klayout-macro>

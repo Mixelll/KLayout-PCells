@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Graphene_Schottky_5(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Graphene_Schottky_5, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("ID", self.TypeString, "ID", default = '') 
+    self.param("lo", self.TypeLayer, "Oxide", default = pya.LayerInfo(0, 0))
+    self.param("lm1", self.TypeLayer, "M1", default = pya.LayerInfo(1, 0))
+    self.param("lg", self.TypeLayer, "Graphene", default = pya.LayerInfo(2, 0))
+    self.param("lm2", self.TypeLayer, "M2", default = pya.LayerInfo(3, 0))
+    #self.param("l99", self.TypeLayer, "Ghost", default = pya.LayerInfo(99, 0))
+    self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    self.param("N_points_polygon", self.TypeInt, "N_points_polygon", default = 1024)
+    self.param("N_Si_Contacts", self.TypeInt, "N_Si_Contacts", default = 2)
+    self.param("N_Graphene_Contacts", self.TypeInt, "N_Graphene_Contacts", default = 2)
+    self.param("Si_contacts_short", self.TypeInt, "Si_contacts_short", default = 1)
+    self.param("ox_in", self.TypeDouble, "ox_in", default = 100)  
+    self.param("oxgap", self.TypeDouble, "oxgap", default = 10) 
+    self.param("ox_ang_1", self.TypeDouble, "ox_ang_1", default = 33) 
+    self.param("ox_ang_2", self.TypeDouble, "ox_ang_2", default = 147)  
+    self.param("ox_outer_x", self.TypeDouble, "ox_outer_x", default = 50) 
+    self.param("ox_outer_y", self.TypeDouble, "ox_outer_y", default = 100)  
+    self.param("m1_ox_diff_outer_x", self.TypeDouble, "m1_ox_diff_outer_x", default = 5)   
+    self.param("m1_ox_diff_outer_y", self.TypeDouble, "m1_ox_diff_outer_y", default = 5) 
+    self.param("m1_ox_diff_radial", self.TypeDouble, "m1_ox_diff_radial", default = 3)
+    self.param("m1_ox_diff_angle", self.TypeDouble, "m1_ox_diff_angle", default = 2)  
+    self.param("gr_in_r_ox_diff", self.TypeDouble, "gr_in_r_ox_diff", default = -3) 
+    self.param("gr_out_r_ox_diff", self.TypeDouble, "gr_out_r_ox_diff", default = 10) 
+    self.param("gr_out_ang_1", self.TypeDouble, "gr_out_ang_1", default = -20) 
+    self.param("gr_out_ang_2", self.TypeDouble, "gr_out_ang_2", default = 20)
+    self.param("force_gr_in_ang_form_rect", self.TypeInt, "force_gr_in_ang_form_rect", default = 1)
+    self.param("gr_in_ang_1", self.TypeDouble, "gr_in_ang_1", default = -20) 
+    self.param("gr_in_ang_2", self.TypeDouble, "gr_in_ang_2", default = 20) 
+    self.param("m1_radial_gr_diff", self.TypeDouble, "m1_radial_gr_diff", default = 5) 
+    self.param("m1_short_from_m1_edge_x", self.TypeDouble, "m1_short_from_m1_edge_x", default = 100)
+    self.param("m1_short_width", self.TypeDouble, "m1_short_width", default = 30)  
+    self.param("m2_gr_diff_ang", self.TypeDouble, "m2_gr_diff_ang", default = 5)
+    self.param("m2_outer_x", self.TypeDouble, "m2_outer_x", default = 50)
+    self.param("m2_top_beyond_rect_shift_y", self.TypeDouble, "m2_top_beyond_rect_shift_y", default = 30)
+    self.param("m2_bot_beyond_rect_shift_y", self.TypeDouble, "m2_bot_beyond_rect_shift_y", default = 30)
+    self.param("m_separation", self.TypeDouble, "m_separation", default = 10)
+    self.param("gr_etch_from_m_edge", self.TypeDouble, "gr_etch_from_m_edge", default = 30)
+    self.param("dier_right_x", self.TypeDouble, "dier_right_x", default = 30)
+    self.param("dier_left_x", self.TypeDouble, "dier_left_x", default = 30)      
+    self.param("dier_top_y", self.TypeDouble, "dier_top_y", default = 30)
+    self.param("dier_bot_y", self.TypeDouble, "dier_bot_y", default = 30)
+    self.param("write_param_in_m1", self.TypeString, "write_param_in_m1", default = '')  
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default = 3)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Graphene Schottky 5"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    
+
+    
+
+    
+    
+    nm2um =1000
+    
+    
+    ox_in = nm2um*self.ox_in
+    oxgap = nm2um*self.oxgap
+    ox_outer_x = nm2um*self.ox_outer_x 
+    ox_outer_y = nm2um*self.ox_outer_y
+    m1_ox_diff_outer_x = nm2um*self.m1_ox_diff_outer_x
+    m1_ox_diff_outer_y = nm2um*self.m1_ox_diff_outer_y
+    m1_ox_diff_radial = nm2um*self.m1_ox_diff_radial
+    gr_in_r_ox_diff = nm2um*self.gr_in_r_ox_diff
+    gr_out_r_ox_diff = nm2um*self.gr_out_r_ox_diff
+    m1_radial_gr_diff = nm2um*self.m1_radial_gr_diff
+    m1_short_from_m1_edge_x = nm2um*self.m1_short_from_m1_edge_x
+    m1_short_width = nm2um*self.m1_short_width
+    m2_outer_x = nm2um*self.m2_outer_x
+    m2_top_beyond_rect_shift_y = nm2um*self.m2_top_beyond_rect_shift_y
+    m2_bot_beyond_rect_shift_y = nm2um*self.m2_bot_beyond_rect_shift_y
+    m_separation = nm2um*self.m_separation
+    gr_etch_from_m_edge = nm2um*self.gr_etch_from_m_edge
+    dier_right_x = nm2um*self.dier_right_x
+    dier_left_x = nm2um*self.dier_left_x
+    dier_top_y = nm2um*self.dier_top_y
+    dier_bot_y = nm2um*self.dier_bot_y
+    
+      
+    ox_gap_tot = ox_in + oxgap
+    ox_outer_tot_x = ox_gap_tot + ox_outer_x
+    ox_outer_tot_y = ox_gap_tot + ox_outer_y
+    
+    m1_rad = ox_gap_tot - m1_ox_diff_radial
+    m1_outer_tot_x = ox_outer_tot_x + m1_ox_diff_outer_x
+    m1_outer_tot_y = ox_outer_tot_y + m1_ox_diff_outer_y
+    
+    m1_angle_1 = self.ox_ang_1 - self.m1_ox_diff_angle
+    m1_angle_2 = self.ox_ang_2 + self.m1_ox_diff_angle
+    
+    gr_in_r = ox_in + gr_in_r_ox_diff
+    gr_out_r = ox_in + gr_out_r_ox_diff
+
+
+    if self.force_gr_in_ang_form_rect:
+      self.gr_in_ang_1 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  - math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+      self.gr_in_ang_2 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  + math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+
+    m2_angle_1 = self.gr_out_ang_1 - self.m2_gr_diff_ang
+    m2_angle_2 = self.gr_out_ang_2 + self.m2_gr_diff_ang
+    
+    
+    def arc(r, hullorhole, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+      
+      if hullorhole:
+         theta_range = range(N,-1,-1)
+      else:
+         theta_range = range(0, N+1)
+        
+      out = list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = pya.Point(r*math.cos(ang), r*math.sin(ang))
+        i = i+1  
+      return out
+    
+        
+    def don(r_in, r_ou, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+    
+      theta_range = range(N, -1,-1)
+      out = 2*list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = pya.Point(r_ou*math.cos(ang), r_ou*math.sin(ang))
+        out[2*N +1 -i] = pya.Point(r_in*math.cos(ang), r_in*math.sin(ang))
+        i = i+1
+          
+      return out
+    
+    
+    def find_minmax_in_seg(seg, mind, axis):
+      if axis=='x':
+        minmax = seg[0].x
+        for point in seg:
+          if mind and point.x&gt;minmax:
+            minmax = point.x
+          elif not mind and point.x&lt;minmax:
+            minmax = point.x
+      elif axis=='y':
+        minmax = seg[0].y
+        for point in seg:
+          if mind and point.y&gt;minmax:
+            minmax = point.y
+          elif not mind and point.y&lt;minmax:
+            minmax = point.y
+      return minmax
+          
+    
+    m2_outer_tot_x = m2_outer_x + gr_out_r
+    m2_outer_tot_y = m1_outer_tot_y
+    
+    
+    # #M2 (Grtaphene contact)
+    #right
+
+    m2_right_arc_points = arc(gr_out_r -m1_radial_gr_diff, 0,m2_angle_1, m2_angle_2, self.N_points_polygon)
+    m2_right_rect_clockwise = [pya.Point(m2_outer_tot_x, find_minmax_in_seg(m2_right_arc_points, 1, 'y') + m2_top_beyond_rect_shift_y), pya.Point(m2_outer_tot_x, find_minmax_in_seg(m2_right_arc_points, 0, 'y') - m2_bot_beyond_rect_shift_y)]
+    
+
+    #left
+    #m2_left_arc_points = arc(self.m2_in_r, 0, 180 -self.m2_ang_2, 180 -self.m2_ang_1, self.N_points_polygon)
+    m2_left_arc_points = arc(gr_out_r -m1_radial_gr_diff, 0, 180 -m2_angle_2, 180 -m2_angle_1, self.N_points_polygon)
+    m2_left_rect_clockwise = [pya.Point(-m2_outer_tot_x,  find_minmax_in_seg(m2_left_arc_points, 0, 'y') - m2_bot_beyond_rect_shift_y), pya.Point(-m2_outer_tot_x, find_minmax_in_seg(m2_left_arc_points, 1, 'y') + m2_top_beyond_rect_shift_y)]
+    
+    if self.N_Graphene_Contacts==1:
+      m2_contact_single = m2_right_rect_clockwise
+      m2_contact_single.extend(m2_left_rect_clockwise)
+      m2_contact_single.extend(m2_right_arc_points)
+      self.cell.shapes(self.lm2_layer).insert(pya.Polygon(m2_contact_single, False))
+      
+    if self.N_Graphene_Contacts&gt;1:
+      m2_right_rect_clockwise.extend(m2_right_arc_points)
+      m2_left_rect_clockwise.extend(m2_left_arc_points)
+      self.cell.shapes(self.lm2_layer).insert(pya.Polygon(m2_right_rect_clockwise, False))
+      self.cell.shapes(self.lm2_layer).insert(pya.Polygon(m2_left_rect_clockwise, False))
+    
+    
+        # #Oxide etch
+    #inner
+    self.cell.shapes(self.lo_layer).insert(pya.Polygon(arc(ox_in, 1,0, 360, self.N_points_polygon) ,False))
+    #outer
+    #-top
+    if self.N_Si_Contacts:
+      ox_top_arc_points = arc(ox_gap_tot, 0,self.ox_ang_1, self.ox_ang_2, self.N_points_polygon)
+      ox_top_right_rect_y = max(ox_top_arc_points[0].y, m2_right_arc_points[self.N_points_polygon].y + m2_top_beyond_rect_shift_y + m_separation + m1_ox_diff_radial)
+      ox_top_left_rect_y = max(ox_top_arc_points[self.N_points_polygon].y, m2_left_arc_points[0].y + m2_top_beyond_rect_shift_y + m_separation + m1_ox_diff_radial)
+      ox_top_rect_clockwise = [pya.Point(-ox_outer_tot_x, ox_top_left_rect_y), pya.Point(-ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_top_right_rect_y)]
+      ox_top_rect_clockwise.extend(ox_top_arc_points)
+      self.cell.shapes(self.lo_layer).insert(pya.Polygon(ox_top_rect_clockwise))
+    #-bot
+    if self.N_Si_Contacts&gt;1:
+      ox_bot_arc_points = arc(ox_gap_tot, 0, 360 -self.ox_ang_2, 360 -self.ox_ang_1, self.N_points_polygon)
+      ox_bot_right_rect_y = min(ox_bot_arc_points[self.N_points_polygon].y, m2_right_arc_points[0].y - m2_bot_beyond_rect_shift_y - m_separation - m1_ox_diff_radial)
+      ox_bot_left_rect_y = min(ox_bot_arc_points[0].y, m2_left_arc_points[self.N_points_polygon].y - m2_bot_beyond_rect_shift_y - m_separation - m1_ox_diff_radial)
+      ox_bot_rect_counterclockwise = [pya.Point(-ox_outer_tot_x, ox_bot_left_rect_y), pya.Point(-ox_outer_tot_x, -ox_outer_tot_y), pya.Point(ox_outer_tot_x, -ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_bot_right_rect_y)]
+      ox_bot_rect_counterclockwise.reverse()
+      ox_bot_rect_counterclockwise.extend(ox_bot_arc_points)
+      self.cell.shapes(self.lo_layer).insert(pya.Polygon(ox_bot_rect_counterclockwise))
+      
+    
+    
+    # #M1 (Si contact)
+    #top
+    if self.N_Si_Contacts:
+      m1_top_arc_points = arc(m1_rad, 0, m1_angle_1, m1_angle_2, self.N_points_polygon)
+      m1_top_right_rect_y = max(m1_top_arc_points[0].y, m2_right_arc_points[self.N_points_polygon].y + m2_top_beyond_rect_shift_y + m_separation)
+      m1_top_left_rect_y = max(m1_top_arc_points[self.N_points_polygon].y, m2_left_arc_points[0].y + m2_top_beyond_rect_shift_y + m_separation)
+      m1_top_rect_clockwise = [pya.Point(-m1_outer_tot_x, m1_top_left_rect_y), pya.Point(-m1_outer_tot_x, m1_outer_tot_y), pya.Point(m1_outer_tot_x, m1_outer_tot_y), pya.Point(m1_outer_tot_x, m1_top_right_rect_y)]
+      m1_top_rect_clockwise.extend(m1_top_arc_points)
+      self.cell.shapes(self.lm1_layer).insert(pya.Polygon(m1_top_rect_clockwise))
+    #bot
+    if self.N_Si_Contacts&gt;1:
+      m1_bot_arc_points = arc(m1_rad, 0, 360 -m1_angle_2, 360 -m1_angle_1, self.N_points_polygon)
+      m1_bot_right_rect_y = min(m1_bot_arc_points[0].y, m2_right_arc_points[0].y - m2_bot_beyond_rect_shift_y - m_separation)
+      m1_bot_left_rect_y = min(m1_bot_arc_points[self.N_points_polygon].y, m2_left_arc_points[self.N_points_polygon].y - m2_bot_beyond_rect_shift_y - m_separation)
+      m1_top_rect_counterclockwise = [pya.Point(-m1_outer_tot_x, m1_bot_left_rect_y), pya.Point(-m1_outer_tot_x, -m1_outer_tot_y), pya.Point(m1_outer_tot_x, -m1_outer_tot_y), pya.Point(m1_outer_tot_x, m1_bot_right_rect_y)]
+      m1_top_rect_counterclockwise.reverse()
+      m1_top_rect_counterclockwise.extend(m1_bot_arc_points)
+      self.cell.shapes(self.lm1_layer).insert(pya.Polygon(m1_top_rect_counterclockwise))
+    #short
+    if self.Si_contacts_short:
+#      m1_short_polygon = pya.Polygon([pya.Point(-m1_outer_tot_x, -m1_outer_tot_y), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x, -m1_outer_tot_y), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x, m1_outer_tot_y), pya.Point(-m1_outer_tot_x, m1_outer_tot_y)])
+#      m1_short_polygon.insert_hole([pya.Point(-m1_outer_tot_x, m1_outer_tot_y -m1_short_width), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x +m1_short_width, m1_outer_tot_y -m1_short_width), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x +m1_short_width, -m1_outer_tot_y +m1_short_width), pya.Point(-m1_outer_tot_x, -m1_outer_tot_y +m1_short_width)])
+      m1_short_polygon = pya.Polygon([pya.Point(-m1_outer_tot_x, -m1_outer_tot_y), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x, -m1_outer_tot_y), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x, m1_outer_tot_y), pya.Point(-m1_outer_tot_x, m1_outer_tot_y), pya.Point(-m1_outer_tot_x, m1_outer_tot_y -m1_short_width), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x +m1_short_width, m1_outer_tot_y -m1_short_width), pya.Point(-m1_outer_tot_x -m1_short_from_m1_edge_x +m1_short_width, -m1_outer_tot_y +m1_short_width), pya.Point(-m1_outer_tot_x, -m1_outer_tot_y +m1_short_width)], False)
+      self.cell.shapes(self.lm1_layer).insert(m1_short_polygon)
+      
+      
+      
+      
+    pre_text_bbox = self.cell.bbox() 
+    if len(self.write_param_in_m1)&gt;0:
+      lay = pya.Layout()
+      text_layer = lay.layer(0, 0)
+      text_layer_info = pya.LayerInfo(0, 0)  
+      param_dict = self.cell.pcell_parameters_by_name()
+      param_dict_keys = param_dict.keys()
+      text = ''
+      for key in param_dict_keys:
+        if key in self.write_param_in_m1:
+          text = key + '=' + str(int(param_dict[key])) +'\n' + text
+      
+      text_param = {'text': text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+      text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+      text_bbox = lay.create_cell("TEXT", "Basic", text_param).bbox()
+      text_shapes.transform(pya.Trans(pre_text_bbox.left, pre_text_bbox.top  + int(m_separation)))
+      self.cell.shapes(self.lm1_layer).insert(text_shapes)
+    
+
+    post_text_bbox = self.cell.bbox()
+    dier_right_x_min = abs(post_text_bbox.right) + gr_etch_from_m_edge
+    dier_left_x_min = abs(post_text_bbox.left) + gr_etch_from_m_edge
+    dier_top_y_min = abs(post_text_bbox.top) + gr_etch_from_m_edge
+    #dier_bot_y_min = max(abs(m2_right_rect_clockwise[1].y), m2_outer_tot_y) + gr_etch_from_m_edge
+    dier_bot_y_min = abs(post_text_bbox.bottom) + gr_etch_from_m_edge
+    
+    if dier_right_x&lt;dier_right_x_min:
+      dier_right_x = dier_right_x_min
+      self.dier_right_x = dier_right_x/nm2um
+    if dier_left_x&lt;dier_left_x_min:
+      dier_left_x = dier_left_x_min
+      self.dier_left_x = dier_left_x/nm2um
+    if dier_top_y&lt;dier_top_y_min:
+      dier_top_y = dier_top_y_min
+      self.dier_top_y = dier_top_y/nm2um
+    if dier_bot_y&lt;dier_bot_y_min:
+      dier_bot_y = dier_bot_y_min
+      self.dier_bot_y = dier_bot_y/nm2um
+      
+      
+      
+      
+        # #Graphene pattern
+    #die size
+    die_hull = pya.Polygon([pya.Point(-dier_left_x, -dier_bot_y) , pya.Point(-dier_left_x, dier_top_y), pya.Point(dier_right_x, dier_top_y), pya.Point(dier_right_x, -dier_bot_y)], False)
+    #graphene shape
+
+    if self.N_Graphene_Contacts&gt;1:
+      gr_hole = arc(gr_out_r, 0, self.gr_out_ang_1, self.gr_out_ang_2, self.N_points_polygon)
+      gr_hole.extend(arc(gr_in_r, 0, self.gr_in_ang_2, 180 - self.gr_in_ang_2, self.N_points_polygon))
+      gr_hole.extend(arc(gr_out_r, 0 , 180 - self.gr_out_ang_2, 180 - self.gr_out_ang_1, self.N_points_polygon))
+      gr_hole.extend(arc(gr_in_r, 0, 180 - self.gr_in_ang_1, self.gr_in_ang_1+360, self.N_points_polygon))
+    else:
+      gr_hole = arc(gr_out_r, 0, self.gr_out_ang_1, self.gr_out_ang_2, self.N_points_polygon)
+      gr_hole.extend(arc(gr_in_r, 0, self.gr_in_ang_2, 360 + self.gr_in_ang_1, self.N_points_polygon))
+
+    die_hull.insert_hole(gr_hole, False)
+    self.cell.shapes(self.lg_layer).insert(die_hull)
+      
+      
+</text>
+</klayout-macro>

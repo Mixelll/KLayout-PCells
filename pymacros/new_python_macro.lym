@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+search_region = pya.Box(-1000, -1000, 1000, 1000)
+layout = pya.CellView.active().layout()
+mat_layer = layout.layer(0, 0)
+met_layer = layout.layer(1, 0)
+con_layer = layout.layer(2, 0)
+top_cell = layout.top_cell()
+mat_shapes = pya.Region(top_cell.begin_shapes_rec_touching(mat_layer, search_region))
+met_shapes = pya.Region(top_cell.begin_shapes_rec_touching(met_layer, search_region))
+con_shapes = pya.Region(top_cell.begin_shapes_rec_touching(con_layer, search_region))
+
+        
+def aaa(spoint, epoint, region, thi):
+  tet1 = 2*math.pi*tet1/360
+  tet2 = 2*math.pi*tet2/360
+   dtet = tet2 - tet1
+    
+  theta_range = range(N, -1,-1)
+   out = 2*list(theta_range)
+   i = 0
+  for tr in theta_range:
+    ang = tet1 + tr*dtet/N
+      out[i] = pya.Point(r_ou*math.cos(ang), r_ou*math.sin(ang))
+      out[2*N +1 -i] = pya.Point(r_in*math.cos(ang), r_in*math.sin(ang))
+     i = i+1
+          
+     return out
+
+for n in k:
+
+  do_not_touch1 = mat_shapes
+  do_not_touch2 = con_shapes
+  do_not_touch.insert(try_box)
+  do_not_touch.insert(try_box)
+  
+#do_not_touch.insert(met_shapes)
+#do_not_touch.insert(con_shapes)
+#cc = pya.Box(-1, -1, 1, 1)
+
+</text>
+</klayout-macro>

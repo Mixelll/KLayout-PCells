@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from pya import *
+import math
+import func
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Graphene_Schottky_6(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Graphene_Schottky_6, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = DPoint(0, 0))
+    # declare the parameters
+    self.param("ID", self.TypeString, "ID", default = '') 
+    self.param("lo", self.TypeLayer, "Oxide", default = LayerInfo(0, 0))
+    self.param("lm1", self.TypeLayer, "M1", default = LayerInfo(1, 0))
+    self.param("lg", self.TypeLayer, "Graphene", default = LayerInfo(2, 0))
+    self.param("lm2", self.TypeLayer, "M2", default = LayerInfo(3, 0))
+    self.param("N_points_polygon", self.TypeInt, "N_points_polygon", default = 1024)
+    self.param("N_Si_Contacts", self.TypeInt, "N_Si_Contacts", default = 2)
+    self.param("N_Graphene_Contacts", self.TypeInt, "N_Graphene_Contacts", default = 2)
+    self.param("ox_in_bool", self.TypeBoolean, "Inner oxide for Schottky", default = True)
+    self.param("ox_in", self.TypeDouble, "ox_in", default = 100)
+    self.param("oxgap", self.TypeDouble, "oxgap", default = 10) 
+    self.param("ox_angle_1", self.TypeDouble, "ox_angle_1", default = 33) 
+    self.param("ox_angle_2", self.TypeDouble, "ox_angle_2", default = 147)  
+    self.param("ox_outer_x", self.TypeDouble, "ox_outer_x", default = 50) 
+    self.param("ox_outer_y", self.TypeDouble, "ox_outer_y", default = 100)
+    self.param("m1_ox", self.TypeDouble, "m1 ox diff", default = -5)
+    self.param("gr_in_r_ox_diff", self.TypeDouble, "gr_in_r_ox_diff", default = -3) 
+    self.param("gr_out_r_ox_diff", self.TypeDouble, "gr_out_r_ox_diff", default = 10)
+    self.param("gr_strip_width", self.TypeDouble, "Graphene strip width", default = 30)
+    self.param("gr_by_angles", self.TypeBoolean, "Use angles to Define Gr strip width", default = True) 
+    self.param("gr_out_ang_1", self.TypeDouble, "gr_out_ang_1", default = -20) 
+    self.param("gr_out_ang_2", self.TypeDouble, "gr_out_ang_2", default = 20)
+    self.param("force_gr_in_ang_form_rect", self.TypeBoolean, "force_gr_in_ang_form_rect", default = True)
+    self.param("gr_in_ang_1", self.TypeDouble, "gr_in_ang_1", default = -20) 
+    self.param("gr_in_ang_2", self.TypeDouble, "gr_in_ang_2", default = 20) 
+    self.param("m2_over_gr", self.TypeDouble, "m2_over_gr", default = 5) 
+    self.param("Si_contacts_short", self.TypeBoolean, "Si_contacts_short", default = True)
+    self.param("m1_short_from_m1_edge_x", self.TypeDouble, "m1_short_from_m1_edge_x", default = 100)
+    self.param("m1_short_width", self.TypeDouble, "m1_short_width", default = 30)  
+    self.param("m2_gr_diff_ang", self.TypeDouble, "m2_gr_diff_ang", default = 5)
+    self.param("m2_outer_x", self.TypeDouble, "m2_outer_x", default = 110)
+    self.param("m2_top_beyond_rect_shift_y", self.TypeDouble, "m2_top_beyond_rect_shift_y", default = 50)
+    self.param("m2_bot_beyond_rect_shift_y", self.TypeDouble, "m2_bot_beyond_rect_shift_y", default = 50)
+    self.param("m_separation", self.TypeDouble, "m_separation", default = 10)
+    self.param("write_param_in_m1", self.TypeString, "write_param_in_ox&amp;m1", default = '')
+    self.param("disp_names", self.TypeBoolean, "Display parameter names", default = False)
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default = 5)
+    self.param("text_sep", self.TypeInt, "text_cell_separation", default = 5)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Graphene Schottky 6"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(Polygon(...))
+
+    
+
+    
+    
+    nm2um =1000
+    
+    
+    ox_in = nm2um*self.ox_in
+    oxgap = nm2um*self.oxgap
+    ox_outer_x = nm2um*self.ox_outer_x 
+    ox_outer_y = nm2um*self.ox_outer_y
+    m1_ox = nm2um*self.m1_ox
+    gr_in_r_ox_diff = nm2um*self.gr_in_r_ox_diff
+    gr_out_r_ox_diff = nm2um*self.gr_out_r_ox_diff 
+    m2_over_gr = nm2um*self.m2_over_gr
+    gr_strip_width = nm2um*self.gr_strip_width
+    m1_short_from_m1_edge_x = nm2um*self.m1_short_from_m1_edge_x
+    m1_short_width = nm2um*self.m1_short_width
+    m2_outer_x = nm2um*self.m2_outer_x
+    m2_top_beyond_rect_shift_y = nm2um*self.m2_top_beyond_rect_shift_y
+    m2_bot_beyond_rect_shift_y = nm2um*self.m2_bot_beyond_rect_shift_y
+    m_separation = nm2um*self.m_separation
+    text_sep = int(nm2um*self.text_sep)
+      
+    m1_rad = ox_in + oxgap
+    m1_outer_tot_x = m1_rad + ox_outer_x
+    m1_outer_tot_y = m1_rad + ox_outer_y
+
+    gr_in_r = ox_in + gr_in_r_ox_diff
+    gr_out_r = ox_in + gr_out_r_ox_diff
+    if self.gr_by_angles:
+      if self.force_gr_in_ang_form_rect:
+       self.gr_in_ang_1 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  - math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+       self.gr_in_ang_2 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  + math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+    else:
+      self.gr_out_ang_1 = -math.degrees(math.asin(gr_strip_width/(2*(ox_in + gr_out_r_ox_diff))))
+      self.gr_out_ang_2 = -self.gr_out_ang_1
+      self.gr_in_ang_1 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  - math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+      self.gr_in_ang_2 = (self.gr_out_ang_1+self.gr_out_ang_2)/2  + math.degrees(math.asin(gr_out_r/gr_in_r * math.sin(math.radians(self.gr_out_ang_2-self.gr_out_ang_1)/2)))
+
+      
+    m2_angle_1 = self.gr_out_ang_1 - self.m2_gr_diff_ang 
+    m2_angle_2 = self.gr_out_ang_2 + self.m2_gr_diff_ang
+    if self.N_Graphene_Contacts&gt;1:
+      m2_angle_1 = (m2_angle_1+m2_angle_2)/2 - math.degrees(math.asin(gr_out_r/(gr_out_r-m2_over_gr) * math.sin(math.radians(m2_angle_2-m2_angle_1)/2)))
+      m2_angle_2 = (m2_angle_1+m2_angle_2)/2 + math.degrees(math.asin(gr_out_r/(gr_out_r-m2_over_gr) * math.sin(math.radians(m2_angle_2-m2_angle_1)/2)))
+    
+    def arc(r, hullorhole, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+      
+      if hullorhole:
+         theta_range = range(N,-1,-1)
+      else:
+         theta_range = range(0, N+1)
+        
+      out = list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = Point(r*math.cos(ang), r*math.sin(ang))
+        i = i+1  
+      return out
+    
+        
+    def don(r_in, r_ou, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+    
+      theta_range = range(N, -1,-1)
+      out = 2*list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = Point(r_ou*math.cos(ang), r_ou*math.sin(ang))
+        out[2*N +1 -i] = Point(r_in*math.cos(ang), r_in*math.sin(ang))
+        i = i+1
+          
+      return out
+    
+    
+    def find_minmax_in_seg(seg, mind, axis):
+      if axis=='x':
+        minmax = seg[0].x
+        for point in seg:
+          if mind and point.x&gt;minmax:
+            minmax = point.x
+          elif not mind and point.x&lt;minmax:
+            minmax = point.x
+      elif axis=='y':
+        minmax = seg[0].y
+        for point in seg:
+          if mind and point.y&gt;minmax:
+            minmax = point.y
+          elif not mind and point.y&lt;minmax:
+            minmax = point.y
+      return minmax
+          
+    
+    m2_outer_tot_x = m2_outer_x + gr_out_r
+    m2_outer_tot_y = m1_outer_tot_y
+    
+    
+    # #M2 (Grtaphene contact)
+    #right
+
+    m2_right_arc_points = arc(gr_out_r -m2_over_gr, 0,m2_angle_1, m2_angle_2, self.N_points_polygon)
+    m2_right_rect_clockwise = [Point(m2_outer_tot_x, find_minmax_in_seg(m2_right_arc_points, 1, 'y') + m2_top_beyond_rect_shift_y), Point(m2_outer_tot_x, find_minmax_in_seg(m2_right_arc_points, 0, 'y') - m2_bot_beyond_rect_shift_y)]
+    
+
+    #left
+    #m2_left_arc_points = arc(self.m2_in_r, 0, 180 -self.m2_ang_2, 180 -self.m2_ang_1, self.N_points_polygon)
+    m2_left_arc_points = arc(gr_out_r -m2_over_gr, 0, 180 -m2_angle_2, 180 -m2_angle_1, self.N_points_polygon)
+    m2_left_rect_clockwise = [Point(-m2_outer_tot_x,  find_minmax_in_seg(m2_left_arc_points, 0, 'y') - m2_bot_beyond_rect_shift_y), Point(-m2_outer_tot_x, find_minmax_in_seg(m2_left_arc_points, 1, 'y') + m2_top_beyond_rect_shift_y)]
+    if self.lm2.layer!=-1:
+      if self.N_Graphene_Contacts==1:
+        m2_contact_single = m2_right_rect_clockwise
+        m2_contact_single.extend(m2_left_rect_clockwise)
+        m2_contact_single.extend(m2_right_arc_points)
+        self.cell.shapes(self.lm2_layer).insert(Polygon(m2_contact_single, False))
+        
+      if self.N_Graphene_Contacts&gt;1:
+        m2_right_rect_clockwise.extend(m2_right_arc_points)
+        m2_left_rect_clockwise.extend(m2_left_arc_points)
+        self.cell.shapes(self.lm2_layer).insert(Polygon(m2_right_rect_clockwise, False))
+        self.cell.shapes(self.lm2_layer).insert(Polygon(m2_left_rect_clockwise, False))
+    
+    
+    # # CenterOxide etch
+
+    # #Oxide and M1 (Si contact)
+    m1_top_arc_points = arc(m1_rad, 0, self.ox_angle_1, self.ox_angle_2, self.N_points_polygon)
+    m1_top_right_rect_y = max(m1_top_arc_points[0].y, m2_right_arc_points[self.N_points_polygon].y + m2_top_beyond_rect_shift_y + m_separation)
+    m1_top_left_rect_y = max(m1_top_arc_points[self.N_points_polygon].y, m2_left_arc_points[0].y + m2_top_beyond_rect_shift_y + m_separation)
+    m1_top_rect_clockwise = [Point(-m1_outer_tot_x, m1_top_left_rect_y), Point(-m1_outer_tot_x, m1_outer_tot_y), Point(m1_outer_tot_x, m1_outer_tot_y), Point(m1_outer_tot_x, m1_top_right_rect_y)]
+    m1_top_rect_clockwise.extend(m1_top_arc_points)
+    
+    m1_bot_arc_points = arc(m1_rad, 0, 360 -self.ox_angle_2, 360 -self.ox_angle_1, self.N_points_polygon)
+    m1_bot_right_rect_y = min(m1_bot_arc_points[0].y, m2_right_arc_points[0].y - m2_bot_beyond_rect_shift_y - m_separation)
+    m1_bot_left_rect_y = min(m1_bot_arc_points[self.N_points_polygon].y, m2_left_arc_points[self.N_points_polygon].y - m2_bot_beyond_rect_shift_y - m_separation)
+    m1_top_rect_counterclockwise = [Point(-m1_outer_tot_x, m1_bot_left_rect_y), Point(-m1_outer_tot_x, -m1_outer_tot_y), Point(m1_outer_tot_x, -m1_outer_tot_y), Point(m1_outer_tot_x, m1_bot_right_rect_y)]
+    m1_top_rect_counterclockwise.reverse()
+    m1_top_rect_counterclockwise.extend(m1_bot_arc_points)
+    
+    m1_short_polygon = Polygon([Point(-m1_outer_tot_x, -m1_outer_tot_y), Point(-m1_short_width-max(m1_short_from_m1_edge_x,m_separation + m2_outer_x + gr_out_r_ox_diff + ox_in, m1_outer_tot_x), -m1_outer_tot_y), \
+    Point(-m1_short_width-max(m1_short_from_m1_edge_x,m_separation + m2_outer_x + gr_out_r_ox_diff + ox_in, m1_outer_tot_x), m1_outer_tot_y), Point(-m1_outer_tot_x, m1_outer_tot_y), \
+    Point(-m1_outer_tot_x, m1_outer_tot_y -m1_short_width), Point(-max(m1_short_from_m1_edge_x,m_separation + m2_outer_x + gr_out_r_ox_diff + ox_in, m1_outer_tot_x), m1_outer_tot_y -m1_short_width), \
+    Point(-max(m1_short_from_m1_edge_x,m_separation + m2_outer_x + gr_out_r_ox_diff + ox_in, m1_outer_tot_x), -m1_outer_tot_y +m1_short_width), Point(-m1_outer_tot_x, -m1_outer_tot_y +m1_short_width)], False)
+
+    
+    if self.lo.layer!=-1:
+    #top
+      if self.N_Si_Contacts:
+        self.cell.shapes(self.lo_layer).insert(Polygon(m1_top_rect_clockwise))
+      #bot
+      if self.N_Si_Contacts&gt;1:
+        self.cell.shapes(self.lo_layer).insert(Polygon(m1_top_rect_counterclockwise))
+      #short
+      if self.N_Si_Contacts&gt;1 and self.Si_contacts_short:
+        self.cell.shapes(self.lo_layer).insert(m1_short_polygon)
+        
+      if self.lm1.layer!=-1:
+        self.cell.shapes(self.lm1_layer).insert(Region(self.cell.shapes(self.lo_layer)).size(m1_ox,3))
+        
+      if self.lo.layer!=-1:
+      #inner ox
+        if self.ox_in_bool:
+          self.cell.shapes(self.lo_layer).insert(Polygon(arc(ox_in, 1,0, 360, self.N_points_polygon) ,False))
+      
+      
+    if self.lg.layer!=-1:
+      if self.N_Graphene_Contacts&gt;1:
+        gr_shape = arc(gr_out_r, 0, self.gr_out_ang_1, self.gr_out_ang_2, self.N_points_polygon)
+        gr_shape.extend(arc(gr_in_r, 0, self.gr_in_ang_2, 180 - self.gr_in_ang_2, self.N_points_polygon))
+        gr_shape.extend(arc(gr_out_r, 0 , 180 - self.gr_out_ang_2, 180 - self.gr_out_ang_1, self.N_points_polygon))
+        gr_shape.extend(arc(gr_in_r, 0, 180 - self.gr_in_ang_1, self.gr_in_ang_1+360, self.N_points_polygon))
+      else:
+        gr_shape = arc(gr_out_r, 0, self.gr_out_ang_1, self.gr_out_ang_2, self.N_points_polygon)
+        gr_shape.extend(arc(gr_in_r, 0, self.gr_in_ang_2, 360 + self.gr_in_ang_1, self.N_points_polygon))
+  
+  
+      self.cell.shapes(self.lg_layer).insert(Polygon(gr_shape))
+      
+    
+    if len(self.write_param_in_m1)&gt;0:
+      pre_text_bbox = self.cell.bbox()
+      lay = Layout()
+      text_layer = lay.layer(0, 0)
+      text_layer_info = LayerInfo(0, 0)  
+      param_dict = self.cell.pcell_parameters_by_name()
+      param_dict_keys = param_dict.keys()
+      text = ''
+      for key in param_dict_keys:
+        if key in self.write_param_in_m1:
+          if type(param_dict[key])==type(5) or type(param_dict[key])==type(5.5):
+            tx = str(int(param_dict[key]))
+          else:
+            tx = param_dict[key]
+          if self.disp_names:
+            text = key + '=' + tx +'\n' + text
+          else:
+            text = tx +'\n' + text
+      
+      text_param = {'text': text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+      text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+      text_shapes.transform(pya.Trans(pre_text_bbox.left, pre_text_bbox.top + text_sep))
+      self.cell.shapes(self.lo_layer).insert(text_shapes)
+      self.cell.shapes(self.lm1_layer).insert(text_shapes)
+
+
+    
+
+      
+      
+</text>
+</klayout-macro>

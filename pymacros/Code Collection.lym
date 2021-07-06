@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+dpath = "C:/Users/sz1x3/Google Drive/EE MSc/KLayout/GDS/"
+
+layout = pya.Layout()
+layout.dbu=1
+#print(layout.dbu)
+top = layout.create_cell("TOP")
+lo = layout.layer(0, 0)
+loo = pya.LayerInfo(1, 0)
+tri = pya.Region(pya.DPolygon([pya.DPoint(-30,-30),pya.DPoint(0,0), pya.DPoint(-30,0), pya.DPoint(100,200), pya.DPoint(200,30)]))
+box = pya.Region(pya.DBox(0,0,1000,1000))
+#box = pya.DBox(0,0,1000,1000)
+
+
+tri1 = tri
+tri2 = tri.sized(50,50,0)
+tri3 = tri.sized(50,50,1)
+tri4 = tri.sized(50,50,2)
+tri5 = tri.sized(50,50,3)
+tri6 = tri.sized(50,50,4)
+mvec = pya.DVector(300, 0)
+tri1.move(0*mvec)
+tri2.move(1*mvec)
+tri3.move(2*mvec)
+tri4.move(3*mvec)
+tri5.move(4*mvec)
+tri6.move(5*mvec)
+top.shapes(lo).insert(tri1)
+top.shapes(lo).insert(tri2)
+top.shapes(lo).insert(tri3)
+top.shapes(lo).insert(tri4)
+top.shapes(lo).insert(tri5)
+top.shapes(lo).insert(tri6)
+
+#res =tri
+#out = res
+#print(out)
+#top.shapes(lo).insert(out)
+#top.shapes(lo).insert(pya.DPolygon([pya.DPoint(-30,-30), pya.DPoint(100,200), pya.DPoint(200,30)]))
+#for i in top.shapes(lo).each():
+#  print(i)
+
+top.shapes(lo).insert(DText("tt", Trans(0,0), 300, -51))
+print(Text("tt", Trans(0,0), 300, 5).font)
+layout.write(dpath + "t.gds")
+
+# inspect classs members, OPTIONAL predicate- only members for which the predicate returns a true value are included
+print(inspect.getmembers(self, predicate=inspect.ismethod))</text>
+</klayout-macro>

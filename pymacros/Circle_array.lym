@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import math
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Circle_array(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Circle_array, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("layers", self.TypeList, "layers", default=[0])
+    self.param("d", self.TypeDouble, "diameter", default = 100)
+    self.param("gaps_x", self.TypeList, "gaps_x", default = [200,200])
+    self.param("gaps_y", self.TypeList, "gaps_y", default = [10,20,30,40,50,60,70,80,90,100])
+    self.param("N", self.TypeInt, "N points circle", default = 1024)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Circle array"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    self.layout.dbu= 1e-6
+    r = self.d/2
+    def arc(r, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+      theta_range = range(N,-1,-1)
+      out = list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = pya.DPoint(r*math.cos(ang), r*math.sin(ang))
+        i = i+1  
+      return out
+    Circle = DPolygon(arc(r, 0, 360, self.N))
+    
+    for l_string in self.layers:
+      l = self.layout.layer(int(l_string), 0)
+      start_x = r
+      self.cell.shapes(l).insert(Circle.transformed(DTrans(start_x, r)))
+      for gp_x in self.gaps_x:
+        start_x += 2*r + float(gp_x)
+        self.cell.shapes(l).insert(Circle.transformed(DTrans(start_x, r)))
+      one_row_shapes = self.cell.shapes(l).dup()
+      for gp_y in self.gaps_y:
+        one_row_shapes.transform(DTrans(0.0, 2*r + float(gp_y)))
+        self.cell.shapes(l).insert(one_row_shapes)</text>
+</klayout-macro>

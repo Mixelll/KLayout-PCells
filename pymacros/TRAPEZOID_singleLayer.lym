@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import math
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class TRAPEZOID_singleLayer(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(TRAPEZOID_singleLayer, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    
+    self.param("layer", self.TypeLayer, "layer")
+    self.param("center_at00", self.TypeBoolean, "center_at00", default = True)
+    self.param("rotate_by", self.TypeDouble, "rotate_by", default = 0)
+    self.param("height", self.TypeDouble, "height", default = 100)
+    self.param("base_a", self.TypeDouble, "base_a", default = 100)
+    self.param("base_b", self.TypeDouble, "base_b", default = 100)
+    self.param("base_a_shift", self.TypeDouble, "base_a_shift", default = 0)
+    
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "TRAPEZOID_singleLayer"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    
+    trap = pya.DPolygon([pya.DPoint(self.base_a_shift, 0), pya.DPoint((self.base_a - self.base_b)/2, self.height), pya.DPoint((self.base_a + self.base_b)/2, self.height), pya.DPoint(self.base_a + self.base_a_shift, 0)], False)
+    if self.center_at00:
+      trap = trap.transformed(pya.DTrans(max(self.base_a,self.base_b)/2, self.height/2))
+    tr = pya.DTrans(0,0)
+    tr.rot = math.ceil(self.rotate_by/90)
+    trap = trap.transformed(tr)
+    self.cell.shapes(self.layer_layer).insert(trap)
+</text>
+</klayout-macro>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Aligment_mark(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Aligment_mark, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("in_layers", self.TypeList, "inner cross layers", default =[1])
+    self.param("out_layers", self.TypeList, "outer cross layers", default =[0,1])
+    self.param("box_layers", self.TypeList, "box layers", default =[0])
+    self.param("box_l", self.TypeDouble, "put a cross between the boxes", default = 50)
+    self.param("cross_l", self.TypeDouble, "cross_l", default = 200)
+    self.param("cross_thick", self.TypeDouble, "cross_thick", default = 4)   
+    self.param("cross_box_sep", self.TypeDouble, "cross_box_sep", default = 0.5)
+    self.param("cross_bar_sep", self.TypeDouble, "cross_bar_sep", default = 5)
+    self.param("bar_thick", self.TypeDouble, "bar_thick", default = 20)
+    self.param("bar_left_l", self.TypeDouble, "bar_left_l", default = 500)
+    self.param("bar_right_l", self.TypeDouble, "bar_right_l", default = 500)
+    self.param("bar_top_l", self.TypeDouble, "bar_top_l", default = 500)
+    self.param("bar_bot_l", self.TypeDouble, "bar_bot_l", default = 500)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Aligment mark"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(l).insert(pya.Polygon(...))
+   
+    mir_x = pya.Trans.M90
+    mir_y = pya.Trans.M0
+    rot90 = pya.Trans.R90
+    rot180 = pya.Trans.R180
+    rot270 = pya.Trans.R270
+    
+    big_box = pya.DBox(self.cross_thick/2 + self.cross_box_sep, self.cross_thick/2 + self.cross_box_sep, self.box_l, self.box_l)
+    cross = pya.DBox(-self.cross_l, -self.cross_thick/2, self.cross_l, self.cross_thick/2)
+    
+    if self.box_layers[0].isdigit():
+      for l_string in self.box_layers:
+        l = self.layout.layer(int(l_string), 0)
+        self.cell.shapes(l).insert(big_box)
+        self.cell.shapes(l).insert(big_box.transformed(mir_x))
+        two_big_boxes = self.cell.shapes(l).dup()
+        self.cell.shapes(l).insert(two_big_boxes, mir_y)
+        
+    if self.in_layers[0].isdigit():
+      for l_string in self.in_layers:
+        l = self.layout.layer(int(l_string), 0)
+        self.cell.shapes(l).insert(cross)
+        self.cell.shapes(l).insert(cross.transformed(rot90))
+        
+    boundry = self.cell.dbbox().left
+    left_bar = pya.DBox(-self.bar_left_l, -self.bar_thick/2, boundry-self.cross_bar_sep, self.bar_thick/2)
+    right_bar = pya.DBox(-self.bar_right_l, -self.bar_thick/2, boundry-self.cross_bar_sep, self.bar_thick/2)
+    right_bar = right_bar.transformed(rot180)
+    top_bar = pya.DBox(-self.bar_top_l, -self.bar_thick/2, boundry-self.cross_bar_sep, self.bar_thick/2)
+    top_bar = top_bar.transformed(rot270)
+    bot_bar = pya.DBox(-self.bar_bot_l, -self.bar_thick/2, boundry-self.cross_bar_sep, self.bar_thick/2)
+    bot_bar = bot_bar.transformed(rot90)
+    
+    if self.out_layers[0].isdigit():
+      for l_string in self.out_layers:
+        l = self.layout.layer(int(l_string), 0)
+        if self.bar_left_l&gt;(self.cross_l+self.cross_bar_sep):
+          self.cell.shapes(l).insert(left_bar)
+        if self.bar_right_l&gt;(self.cross_l+self.cross_bar_sep):
+          self.cell.shapes(l).insert(right_bar)
+        if self.bar_top_l&gt;(self.cross_l+self.cross_bar_sep):
+          self.cell.shapes(l).insert(top_bar)
+        if self.bar_bot_l&gt;(self.cross_l+self.cross_bar_sep):
+          self.cell.shapes(l).insert(bot_bar)
+    
+    
+    </text>
+</klayout-macro>

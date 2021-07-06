@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text># Python version: 3.7
+
+import pya
+dpath = "C:/Users/Mixel/Google Drive/EE MSc/KLayout/GDS/"
+N_points_polygon = 1024
+
+
+#ox_metal_equal = 1
+
+ox_inner = 100000
+oxgap = 10000
+ox_outer_x = 50000
+ox_outer_y = 100000
+ox_ang_1 = 0
+ox_ang_2 = 180
+
+m1_outer_ox_diff_x = 0
+m1_outer_ox_diff_y = 0
+
+m1_inner_radial_ox_diff = 0
+
+
+  
+ox_gap_tot = ox_inner + oxgap
+ox_outer_tot_x = ox_gap_tot + ox_outer_x
+ox_outer_tot_y = ox_gap_tot + ox_outer_y
+
+m1_rad = ox_gap_tot + m1_inner_radial_ox_diff
+m1_outer_x = ox_outer_tot_x + m1_outer_ox_diff_x
+m1_outer_y = ox_outer_tot_y + m1_outer_ox_diff_y
+
+gr_in_r = 110000
+gr_out_r = 110000
+gr_ang_1 = -40
+gr_ang_2 = -6
+
+m2_in_r = 105000
+m2_ang_1 = -41
+m2_ang_2 = -5
+
+m2_outer_x = m1_outer_x
+m2_outer_y = m1_outer_y
+m2_outer_sep = 100000
+
+m_die_edge_sep = 20000
+dier_x = max(m1_outer_x, m2_outer_x) + m_die_edge_sep
+dier_y = max(m1_outer_y, m2_outer_y) + m_die_edge_sep
+
+layout = pya.Layout()
+top = layout.create_cell("TOP")
+
+lo = layout.layer(0, 0, "oxide opening")
+lm1 = layout.layer(1, 0, "m1")
+lg = layout.layer(2, 0, "graphene RIE")
+lm2 = layout.layer(3, 0, "m2")
+
+def circ(r, hullorhole, tet1, tet2, N):
+  tet1 = 2*math.pi*tet1/360
+  tet2 = 2*math.pi*tet2/360
+  dtet = tet2 - tet1
+  
+  if hullorhole:
+     theta_range = range(N,-1,-1)
+  else:
+     theta_range = range(0, N+1)
+    
+  out = list(theta_range)
+  i = 0
+  for tr in theta_range:
+    ang = tet1 + tr*dtet/N
+    out[i] = pya.Point(r*math.cos(ang), r*math.sin(ang))
+    i = i+1  
+  return out
+
+    
+def don(r_in, r_ou, tet1, tet2, N):
+  tet1 = 2*math.pi*tet1/360
+  tet2 = 2*math.pi*tet2/360
+  dtet = tet2 - tet1
+
+  theta_range = range(N, -1,-1)
+  out = 2*list(theta_range)
+  i = 0
+  for tr in theta_range:
+    ang = tet1 + tr*dtet/N
+    out[i] = pya.Point(r_ou*math.cos(ang), r_ou*math.sin(ang))
+    out[2*N +1 -i] = pya.Point(r_in*math.cos(ang), r_in*math.sin(ang))
+    i = i+1
+      
+  return out
+
+# #Oxide etch
+# inner
+top.shapes(lo).insert(pya.Polygon(circ(ox_inner, 1,0, 360, N_points_polygon) ,False))
+#outer
+ox_arc_points = circ(ox_gap_tot, 0,ox_ang_1, ox_ang_2, N_points_polygon)
+clockwise_ox_rect = [pya.Point(-ox_outer_tot_x, ox_arc_points[0].y), pya.Point(-ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_arc_points[0].y)]
+clockwise_ox_rect.extend(ox_arc_points)
+
+top.shapes(lo).insert(pya.Polygon(clockwise_ox_rect))
+
+
+
+# #Si contact M1
+
+m1_arc_points = circ(m1_rad, 0,ox_ang_1, ox_ang_2, N_points_polygon)
+clockwise_m1_rect = [pya.Point(-m1_outer_x, m1_arc_points[0].y), pya.Point(-m1_outer_x, m1_outer_y), pya.Point(m1_outer_x, m1_outer_y), pya.Point(m1_outer_x, m1_arc_points[0].y)]
+clockwise_m1_rect.extend(m1_arc_points)
+
+top.shapes(lm1).insert(pya.Polygon(clockwise_m1_rect))
+
+
+
+
+# #Graphene pattern
+#die size
+die_hull = pya.Polygon([pya.Point(-dier_x, -dier_y) , pya.Point(-dier_x, dier_y), pya.Point(dier_x, dier_y), pya.Point(dier_x, -dier_y)], False)
+#graphene shape
+gr_hole = circ(gr_out_r, 0,gr_ang_1, gr_ang_2, N_points_polygon)
+gr_hole.extend(circ(gr_in_r, 0,gr_ang_2, 180 - gr_ang_2, N_points_polygon))
+gr_hole.extend(circ(gr_out_r, 0 , 180 - gr_ang_2, 180 - gr_ang_1, N_points_polygon))
+gr_hole.extend(circ(gr_in_r, 0, 180 - gr_ang_1, gr_ang_1+360, N_points_polygon))
+
+die_hull.insert_hole(gr_hole, False)
+top.shapes(lg).insert(die_hull)
+
+# #M2
+#right
+m2_right_arc_points = circ(m2_in_r, 1,m2_ang_1, m2_ang_2, N_points_polygon)
+clockwise_m2_rect = [pya.Point(m2_outer_sep/2, -m2_outer_y), pya.Point(m2_outer_x, -m2_outer_y), pya.Point(m2_outer_x, m2_in_r*math.sin(m2_ang_2*(math.pi/180)))]
+clockwise_m2_rect.extend(m2_right_arc_points)
+clockwise_m2_rect.reverse()
+top.shapes(lm2).insert(pya.Polygon(clockwise_m2_rect, False))
+#left
+m2_right_arc_points = circ(m2_in_r, 0, 180 -m2_ang_2, 180 -m2_ang_1, N_points_polygon)
+clockwise_m2_rect = [pya.Point(-m2_outer_sep/2, -m2_outer_y), pya.Point(-m2_outer_x, -m2_outer_y), pya.Point(-m2_outer_x, m2_in_r*math.sin(m2_ang_2*(math.pi/180)))]
+clockwise_m2_rect.extend(m2_right_arc_points)
+top.shapes(lm2).insert(pya.Polygon(clockwise_m2_rect, False))
+
+
+# #M2
+#Graphene conntacts
+#g_right_con = don(m2_in_r, m2_out_r, m2_ang_1, m2_ang_2, N_points_polygon)
+#top.shapes(lm2).insert(pya.Polygon(g_right_con, False))
+#top.shapes(lm2).insert(pya.Polygon(don(m2_in_r, m2_out_r, 180 -m2_ang_2, 180 -m2_ang_1, N_points_polygon)), False)
+#M2 extension
+#m2_bot_in_x = m2_in_r*math.cos(m2_ang_1)
+#m2_bot_in_y = m2_in_r*math.sin(m2_ang_1)
+#m2_r = m2_out_r - m2_in_r
+
+#top.shapes(lm2).insert([pya.Point(m2_bot_in_x, m2_bot_in_y), pya.Point(m2_bot_in_x +m2_r, m2_bot_in_y), pya.Point(m1_outer_x, m1_outer_y), pya.Point(m1_outer_x, m1_arc_points[0].y)], False))
+
+
+layout.write(dpath + "t.gds")
+
+
+</text>
+</klayout-macro>

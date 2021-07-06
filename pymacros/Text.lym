@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Textt(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Textt, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("layers", self.TypeList, "layers", default =[0,1])
+    self.param("text", self.TypeString, "text")
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default =3)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Text"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+
+    lay = pya.Layout()
+    text_layer = lay.layer(0, 0)
+    text_layer_info = pya.LayerInfo(0, 0)
+    text_param = {'text': self.text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+    text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+    text_dbox = lay.create_cell("TEXT", "Basic", text_param).dbbox()
+    for l_string in self.layers:
+      l = self.layout.layer(int(l_string), 0)
+      self.cell.shapes(l).insert(text_shapes)
+           
+
+    
+  
+</text>
+</klayout-macro>

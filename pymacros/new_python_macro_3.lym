@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+dpath = "C:/Users/Mixel/Google Drive/EE MSc/KLayout/GDS/"
+
+lay = pya.Layout()
+
+l0 = lay.layer(0, 0)
+l1 = lay.layer(1, 0)
+l0_info = pya.LayerInfo(0, 0)
+
+top  = lay.create_cell("fghxgfh")
+for i in range(1,6):
+  box1 = pya.Box(pya.Point(0, 0), pya.Point(5, 10))*i
+  top.shapes(l0).insert(box1)
+
+lay.write(dpath + "t.gds")
+
+
+
+
+  </text>
+</klayout-macro>

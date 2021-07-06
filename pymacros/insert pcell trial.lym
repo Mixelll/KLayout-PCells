@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+dpath = "C:/Users/sz1x3/Google Drive/EE MSc/KLayout/"
+
+
+
+
+layout = pya.Layout()
+top = layout.create_cell("TOP")
+layout.layer(0, 0)
+layout.layer(1, 0, "oxide opening")
+layout.layer(2, 0, "oxide opening")
+loo = pya.LayerInfo(1, 0)
+text = 'n'
+text2 = 'nig'
+text_param = {'text': text, 'layer': loo, 'mag': 620.0}
+pc = layout.create_cell("TEXT", "Basic", text_param)
+text_param2 = {'text': text2, 'layer': loo, 'mag': 620.0}
+pc2 = layout.create_cell("TEXT", "Basic", text_param2)
+
+
+top.shapes(loo.layer).insert(pc.shapes(loo.layer))
+top.shapes(loo.layer).insert(pc2.shapes(loo.layer))
+dc = layout.create_cell("Graphene_Schottky_5", "PCellLib")
+print(dc.bbox())
+top.shapes(loo.layer).insert(dc.shapes(loo.layer))
+x = dc.pcell_parameters_by_name()
+bb = pya.Box(0,0,0,0)
+ss = top.shapes(loo.layer).each()
+for s in ss:
+  bb = bb + s.bbox()
+  #print(bb)
+
+
+#top.shapes(laa.layer).insert(pya.Polygon([pya.Point(-1000, -1000), pya.Point(-1000, 1000), pya.Point(1000, 1000), pya.Point(1000, -1000)]))
+
+
+
+layout.write(dpath + "t.gds")</text>
+</klayout-macro>

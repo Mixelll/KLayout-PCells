@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import math
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Graphene_Schottky_comb(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Graphene_Schottky_comb, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("ID", self.TypeString, "ID", default = '') 
+    self.param("length", self.TypeDouble, "length", default = 300)
+    self.param("width", self.TypeDouble, "width", default = 300)    
+    self.param("gr_d", self.TypeDouble, "gr_d", default = 5)  
+    self.param("gr_m1ox_gap", self.TypeDouble, "gr_m1ox_gap", default = 7)
+    self.param("m1ox_d", self.TypeDouble, "m1ox_d", default = 5)
+    self.param("m1_beyond_ox", self.TypeDouble, "m1_beyond_ox", default = 1)
+    self.param("ox_beyond_gr", self.TypeDouble, "ox_beyond_gr", default = 1)
+    self.param("m1_out", self.TypeDouble, "m1_out", default = 20)
+    self.param("gr_out", self.TypeDouble, "gr_out", default = 20)
+    self.param("m1_side", self.TypeDouble, "m1_side", default = 100)
+    self.param("gr_side", self.TypeDouble, "gr_side", default = 100)
+    self.param("m2_on_gr", self.TypeDouble, "m2_on_gr", default = 1)
+    self.param("m2_beyond_gr", self.TypeDouble, "m2_beyond_gr", default = 30)
+    self.param("m2_rest_sep", self.TypeDouble, "m2_rest_sep", default = 20)
+    self.param("sizing_mode", self.TypeDouble, "sizing_mode", default = 5)
+    self.param("m2_poly_area_ratio", self.TypeDouble, "m2_poly_area_ratio", default = 10)
+    
+    self.param("lox", self.TypeLayer, "Oxide", default = pya.LayerInfo(0, 0))
+    self.param("lm1", self.TypeLayer, "M1", default = pya.LayerInfo(1, 0))
+    self.param("lgr", self.TypeLayer, "Graphene", default = pya.LayerInfo(2, 0))
+    self.param("lm2", self.TypeLayer, "M2", default = pya.LayerInfo(3, 0))
+    self.param("lt", self.TypeLayer, "Text", default = pya.LayerInfo(1, 0))
+    
+    self.param("write_param_in_m1", self.TypeString, "write_param_in_m1", default = '')  
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default = 3)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Graphene Schottky comb"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...)
+    nm2um = 1000
+    
+    cycle = self.gr_d+2*self.gr_m1ox_gap + self.m1ox_d
+    for i in range(0, math.floor(self.length/cycle)):
+      self.cell.shapes(self.lox_layer).insert(pya.DBox(-self.m1_out -self.width/2, i*cycle, self.width/2, i*cycle  + self.m1ox_d))
+      self.cell.shapes(self.lm1_layer).insert(pya.DBox(-self.m1_out -self.width/2, i*cycle -self.m1_beyond_ox, self.width/2+self.m1_beyond_ox, i*cycle +self.m1ox_d+self.m1_beyond_ox))
+      self.cell.shapes(self.lgr_layer).insert(pya.DBox(-self.width/2, i*cycle+self.gr_m1ox_gap+self.m1ox_d, self.width/2 +self.gr_out, i*cycle+self.gr_m1ox_gap+self.m1ox_d+self.gr_d))
+      self.cell.shapes(self.lox_layer).insert(pya.DBox(-self.width/2-self.ox_beyond_gr, i*cycle+self.gr_m1ox_gap+self.m1ox_d-self.ox_beyond_gr, self.width/2, i*cycle+self.gr_m1ox_gap+self.m1ox_d+self.gr_d+self.ox_beyond_gr))
+    i +=1
+    self.cell.shapes(self.lox_layer).insert(pya.DBox(-self.m1_out-self.width/2, i*cycle, self.width/2, i*cycle  + self.m1ox_d))
+    self.cell.shapes(self.lm1_layer).insert(pya.DBox(-self.m1_out -self.width/2, i*cycle -self.m1_beyond_ox, self.width/2+self.m1_beyond_ox, i*cycle +self.m1ox_d+self.m1_beyond_ox))
+    self.cell.shapes(self.lm1_layer).insert(pya.DBox(-self.m1_side -self.m1_out -self.width/2, -self.m1_beyond_ox, -self.m1_out -self.width/2, i*cycle  + self.m1ox_d +self.m1_beyond_ox))
+    self.cell.shapes(self.lgr_layer).insert(pya.DBox(self.width/2+self.gr_out, self.gr_m1ox_gap+self.m1ox_d, self.width/2+self.gr_out +self.gr_side , i*cycle-self.gr_m1ox_gap)) 
+    rgom1 = pya.Region((self.cell.dbbox_per_layer(0)+self.cell.dbbox_per_layer(1))*nm2um) #M1
+    rg = pya.Region(self.cell.shapes(self.lgr_layer))
+    rg -= pya.Region(self.cell.shapes(self.lox_layer)) - pya.Region(self.cell.shapes(self.lm1_layer))
+    rg_sized = rg.sized(nm2um*self.m2_beyond_gr, nm2um*self.m2_beyond_gr, self.sizing_mode)
+    rm2 = rg_sized - rg.sized(-nm2um*self.m2_on_gr, -nm2um*self.m2_on_gr, self.sizing_mode)
+    rm2 -= rgom1.sized(nm2um*self.m2_rest_sep, nm2um*self.m2_rest_sep, self.sizing_mode)
+    rm2 = rm2.overlapping(rg)
+    iarea = 0
+    rm2n = pya.Region()
+    for i in rm2.each():
+      if i.area()&gt;iarea:
+        iarea = i.area()
+    for i in rm2.each():
+      if i.area()&gt;iarea/self.m2_poly_area_ratio:
+        rm2n.insert(i)
+        
+    self.cell.shapes(self.lm2_layer).insert(rm2n)
+    
+    
+    if len(self.write_param_in_m1)&gt;0:
+      pre_text_bbox = self.cell.bbox()
+      lay = pya.Layout()
+      text_layer = lay.layer(0, 0)
+      text_layer_info = pya.LayerInfo(0, 0)  
+      param_dict = self.cell.pcell_parameters_by_name()
+      param_dict_keys = param_dict.keys()
+      text = ''
+      for key in param_dict_keys:
+        if key in self.write_param_in_m1:
+          text = key + '=' + str(int(param_dict[key])) +'\n' + text
+      
+      text_param = {'text': text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+      text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+#      text_bbox = lay.create_cell("TEXT", "Basic", text_param).bbox()
+      text_shapes.transform(pya.Trans(pre_text_bbox.left, pre_text_bbox.top + int(m_separation)))
+      self.cell.shapes(self.lt_layer).insert(text_shapes)
+    
+
+    
+
+      
+      
+</text>
+</klayout-macro>

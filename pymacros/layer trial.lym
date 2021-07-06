@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+dpath = "C:/Users/Mixel/Google Drive/EE MSc/KLayout/"
+
+layout = pya.Layout()
+top = layout.create_cell("TOP")
+
+
+
+lo = layout.layer(0, 0)
+
+top.shapes(lo).insert(pya.DPath([pya.DPoint(0,0), pya.DPoint(-100,-100)], 30))
+layout.write(dpath + "t.gds")</text>
+</klayout-macro>

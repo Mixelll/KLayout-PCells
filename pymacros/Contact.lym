@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import math
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Contact(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Contact, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    
+
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Contact"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    def leg(region, sep, start_p, end_p, width)
+      vec = end_p - start_p
+      vec_x = vec
+      vec_y = vec
+      vec_x.y=(0)
+      vec_y.x=(0)
+      temp_region_x_first = pya.Region()
+      temp_region_y_first = pya.Region()
+      temp_region_x_first.insert(pya.DPath([start_p, start_p + vec_x, end_p], width))
+      temp_region_y_first.insert(pya.DPath([start_p, start_p + vec_y, end_p], width))
+      if not region.separation_check(temp_region_x_first, sep) and not region.interacting(temp_region_x_first, sep):
+       return pya.DPath([start_p, start_p + vec_x, end_p], width)
+      if not region.separation_check(temp_region_x_first, sep) and not region.interacting(temp_region_x_first, sep):
+        return pya.DPath([start_p, start_p + vec_y, end_p], width)
+    sqr_N_pad = math.ceil(math.sqrt(N_points_pad))
+    pad_rel_pos_list = []
+    pad_range_horz = pad_range_horz_0
+    for n_vert in range(0, sqr_N_pad)
+        pad_range_horz += pad_horz2vert_slope*n_vert/sqr_N_pad*pad_range_vert
+      for n_horz in range(0, sqr_N_pad)
+        pad_rel_pos_list.append(pya.DPoint(n_horz/sqr_N_pad*(-1)**n_horz*pad_range_horz, n_vert/sqr_N_pad*pad_range_vert)
+    search_region = pya.DBox(-1000, -1000, 1000, 1000)
+    layout = pya.CellView.active().layout()
+    mat_layer = layout.layer(0, 0)
+    con_layer = layout.layer(0, 0)
+    top_cell = layout.top_cell()
+    mat_reg = pya.Region(top_cell.begin_shapes_rec_touching(mat_layer, search_region))
+    con_reg = pya.Region(top_cell.begin_shapes_rec_touching(con_layer, search_region))
+    for poly in con_reg.each:
+      poly_reg = pya.Region(poly)
+      for edgepair in poly_reg.overlap_check(mat_reg, 0):
+        edge = edgepair.first.to_dtype()
+        edge_center_p = pya.DPoint((edge.x1 + edge.x2)/2, (edge.y1 + edge.y2)/2)
+        break
+      dpoly = poly.to_dtype()
+      dpoly_np = dpoly.num_points_hull
+      dpoly_center_px = 0
+      dpoly_center_py = 0
+      for dpoly_p in dpoly.each_point_hull:
+        dpoly_center_px += dpoly_p.x/dpoly_np
+        dpoly_center_py += dpoly_p.y/dpoly_np
+      dpoly_center_p = pya.DPoint(dpoly_center_px, dpoly_center_py)
+      pad_dvector = edge_center_p - dpoly_center_p
+      for pad_rel_pos in pad_rel_pos_list:
+        
+    
+</text>
+</klayout-macro>

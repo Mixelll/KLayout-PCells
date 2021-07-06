@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Graphene_Schottky_3(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Graphene_Schottky_3, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("dpath", self.TypeString, "", default = "C:/Users/sz1x3/Google Drive/EE MSc/KLayout/")
+    self.param("lo", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    self.param("lm1", self.TypeLayer, "Layer", default = pya.LayerInfo(2, 0))
+    self.param("lg", self.TypeLayer, "Layer", default = pya.LayerInfo(3, 0))
+    self.param("lm2", self.TypeLayer, "Layer", default = pya.LayerInfo(4, 0))
+    self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    self.param("N_points_polygon", self.TypeShape, "N_points_polygon", default = 1024)
+    self.param("ox_inner", self.TypeDouble, "ox_inner", default = 100000)  
+    self.param("oxgap", self.TypeDouble, "oxgap", default = 10000) 
+    self.param("ox_outer_x", self.TypeDouble, "ox_outer_x", default = 50000) 
+    self.param("ox_outer_y", self.TypeDouble, "ox_outer_y", default = 100000)  
+    self.param("ox_ang_1", self.TypeDouble, "ox_ang_1", default = 0) 
+    self.param("ox_ang_2", self.TypeDouble, "ox_ang_2", default = 180)  
+    self.param("m1_outer_ox_diff_x", self.TypeDouble, "m1_outer_ox_diff_x", default = 0)   
+    self.param("m1_outer_ox_diff_y", self.TypeDouble, "m1_outer_ox_diff_y", default = 0) 
+    self.param("m1_inner_radial_ox_diff", self.TypeDouble, "m1_inner_radial_ox_diff", default = 0) 
+    self.param("gr_in_r", self.TypeDouble, "gr_in_r", default = 95000) 
+    self.param("gr_out_r", self.TypeDouble, "gr_out_r", default = 110000) 
+    self.param("gr_ang_1", self.TypeDouble, "gr_ang_1", default = -40) 
+    self.param("gr_ang_2", self.TypeDouble, "gr_ang_2", default = -6) 
+    self.param("m2_in_r", self.TypeDouble, "m2_in_r", default = 105000) 
+    self.param("m2_ang_1", self.TypeDouble, "m2_ang_1", default = -41) 
+    self.param("m2_ang_2", self.TypeDouble, "m2_ang_2", default = -5)  
+    self.param("m2_outer_sep", self.TypeDouble, "m2_outer_sep", default = 100000)
+    self.param("m_die_edge_sep", self.TypeDouble, "m_die_edge_sep", default = 30000)
+    self.param("dier_x", self.TypeDouble, "dier_x", default = 30000)   
+    self.param("dier_y", self.TypeDouble, "dier_y", default = 30000)   
+    
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Graphene Schottky 3"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    self.dpath =  "C:/Users/sz1x3/Google Drive/EE MSc/KLayout/"
+    
+    
+    #ox_metal_equal = 1
+    
+  #  self.ox_inner = 100000
+  #  self.oxgap = 10000
+  #  self.ox_outer_x = 50000
+  #  self.ox_outer_y = 100000
+ #   self.ox_ang_1 = 0
+ #   self.ox_ang_2 = 180
+    
+  #  self.m1_outer_ox_diff_x = 0
+   # self.m1_outer_ox_diff_y = 0
+    
+   # self.m1_inner_radial_ox_diff = 0
+    
+    
+      
+    ox_gap_tot = self.ox_inner + self.oxgap
+    ox_outer_tot_x = ox_gap_tot + self.ox_outer_x
+    ox_outer_tot_y = ox_gap_tot + self.ox_outer_y
+    
+    m1_rad = ox_gap_tot + self.m1_inner_radial_ox_diff
+    m1_outer_x = ox_outer_tot_x + self.m1_outer_ox_diff_x
+    m1_outer_y = ox_outer_tot_y + self.m1_outer_ox_diff_y
+    
+   # self.gr_in_r = 110000
+  #  self.gr_out_r = 110000
+  #  self.gr_ang_1 = -40
+   # self.gr_ang_2 = -6
+    
+   # self.m2_in_r = 105000
+   # self.m2_ang_1 = -41
+   # self.m2_ang_2 = -5
+    
+    m2_outer_x = m1_outer_x
+    m2_outer_y = m1_outer_y
+    #self.m2_outer_sep = 100000
+
+    dier_x = max(m1_outer_x, m2_outer_x) + self.m_die_edge_sep
+    dier_y = max(m1_outer_y, m2_outer_y) + self.m_die_edge_sep
+    if self.dier_x&lt;dier_x:
+      self.dier_x = dier_x
+    if self.dier_y&lt;dier_y:
+      self.dier_y = dier_y
+      
+    layout = pya.Layout()
+    top = layout.create_cell("TOP")
+    
+#    lo = layout.layer(1, 0, "oxide opening")
+#    lm1 = layout.layer(2, 0, "m1")
+#    lg = layout.layer(3, 0, "graphene RIE")
+#    lm2 = layout.layer(4, 0, "m2")
+    
+    def circ(r, hullorhole, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+      
+      if hullorhole:
+         theta_range = range(N,-1,-1)
+      else:
+         theta_range = range(0, N+1)
+        
+      out = list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = pya.Point(r*math.cos(ang), r*math.sin(ang))
+        i = i+1  
+      return out
+    
+        
+    def don(r_in, r_ou, tet1, tet2, N):
+      tet1 = 2*math.pi*tet1/360
+      tet2 = 2*math.pi*tet2/360
+      dtet = tet2 - tet1
+    
+      theta_range = range(N, -1,-1)
+      out = 2*list(theta_range)
+      i = 0
+      for tr in theta_range:
+        ang = tet1 + tr*dtet/N
+        out[i] = pya.Point(r_ou*math.cos(ang), r_ou*math.sin(ang))
+        out[2*N +1 -i] = pya.Point(r_in*math.cos(ang), r_in*math.sin(ang))
+        i = i+1
+          
+      return out
+    
+    # #Oxide etch
+    # inner
+    self.cell.shapes(self.lo_layer).insert(pya.Polygon(circ(self.ox_inner, 1,0, 360, self.N_points_polygon) ,False))
+    #outer
+    ox_arc_points = circ(ox_gap_tot, 0,self.ox_ang_1, self.ox_ang_2, self.N_points_polygon)
+    clockwise_ox_rect = [pya.Point(-ox_outer_tot_x, ox_arc_points[0].y), pya.Point(-ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_outer_tot_y), pya.Point(ox_outer_tot_x, ox_arc_points[0].y)]
+    clockwise_ox_rect.extend(ox_arc_points)
+    
+    self.cell.shapes(self.lo_layer).insert(pya.Polygon(clockwise_ox_rect))
+    
+    
+    # #Si contact M1
+    
+    m1_arc_points = circ(m1_rad, 0,self.ox_ang_1, self.ox_ang_2, self.N_points_polygon)
+    clockwise_m1_rect = [pya.Point(-m1_outer_x, m1_arc_points[0].y), pya.Point(-m1_outer_x, m1_outer_y), pya.Point(m1_outer_x, m1_outer_y), pya.Point(m1_outer_x, m1_arc_points[0].y)]
+    clockwise_m1_rect.extend(m1_arc_points)
+    
+    self.cell.shapes(self.lm1_layer).insert(pya.Polygon(clockwise_m1_rect))
+    
+    
+    
+    
+    # #Graphene pattern
+    #die size
+    die_hull = pya.Polygon([pya.Point(-self.dier_x, -self.dier_y) , pya.Point(-self.dier_x, self.dier_y), pya.Point(self.dier_x, self.dier_y), pya.Point(self.dier_x, -self.dier_y)], False)
+    #graphene shape
+    gr_hole = circ(self.gr_out_r, 0,self.gr_ang_1, self.gr_ang_2, self.N_points_polygon)
+    gr_hole.extend(circ(self.gr_in_r, 0,self.gr_ang_2, 180 - self.gr_ang_2, self.N_points_polygon))
+    gr_hole.extend(circ(self.gr_out_r, 0 , 180 - self.gr_ang_2, 180 - self.gr_ang_1, self.N_points_polygon))
+    gr_hole.extend(circ(self.gr_in_r, 0, 180 - self.gr_ang_1, self.gr_ang_1+360, self.N_points_polygon))
+    
+    die_hull.insert_hole(gr_hole, False)
+    self.cell.shapes(self.lg_layer).insert(die_hull)
+    
+    # #M2
+    #right
+    m2_right_arc_points = circ(self.m2_in_r, 1,self.m2_ang_1, self.m2_ang_2, self.N_points_polygon)
+    clockwise_m2_rect = [pya.Point(self.m2_outer_sep/2, -m2_outer_y), pya.Point(m2_outer_x, -m2_outer_y), pya.Point(m2_outer_x, self.m2_in_r*math.sin(self.m2_ang_2*(math.pi/180)))]
+    clockwise_m2_rect.extend(m2_right_arc_points)
+    clockwise_m2_rect.reverse()
+    self.cell.shapes(self.lm2_layer).insert(pya.Polygon(clockwise_m2_rect, False))
+    #left
+    m2_right_arc_points = circ(self.m2_in_r, 0, 180 -self.m2_ang_2, 180 -self.m2_ang_1, self.N_points_polygon)
+    clockwise_m2_rect = [pya.Point(-self.m2_outer_sep/2, -m2_outer_y), pya.Point(-m2_outer_x, -m2_outer_y), pya.Point(-m2_outer_x, self.m2_in_r*math.sin(self.m2_ang_2*(math.pi/180)))]
+    clockwise_m2_rect.extend(m2_right_arc_points)
+    self.cell.shapes(self.lm2_layer).insert(pya.Polygon(clockwise_m2_rect, False))
+
+# layout.write(self.dpath + "device_3a.gds")
+
+
+  # optional:
+  # def can_create_from_shape_impl(self):
+  #   TODO: determine if we have a shape that we can use to derive the 
+  #   PCell parameters from and return true in that case
+  # 
+  # optional:
+  # def parameters_from_shape_impl(self):
+  #   TODO: change parameters using set_x to reflect the parameter for the
+  #   given shape
+  # 
+  # optional:
+  # def transformation_from_shape_impl(self):
+  #   TODO: return a RBA::Trans object for the initial transformation of
+  #   the instance
+  
+# TODO: add more PCell classes ..
+
+# The PCell library declaration
+# A PCell library must be declared by deriving a custom class from RBA::Library.
+# The main purpose of this class is to provide the PCell declarations and to register itself
+# with a proper name.
+# TODO: change the class name
+#class PCellLib(pya.Library):
+
+#  def __init__(self):
+  
+    # TODO: change the description
+#    self.description = "My PCell library"
+    
+    # register the PCell declarations
+    # TODO: change the names
+#PCellLib().layout().register_pcell("Graphene_Schottky_3", Graphene_Schottky_3())
+    # TODO: register more PCell declarations
+    
+    # register our library with the name "PCellLib"
+    # TODO: change the library name
+#    self.register("PCellLib")
+    
+# instantiate and register the library
+# TODO: change the library name
+#PCellLib()
+
+</text>
+</klayout-macro>

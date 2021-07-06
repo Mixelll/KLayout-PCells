@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from pya import *
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Hall_bar(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Hall_bar, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = DPoint(0, 0))
+    # declare the parameters
+    
+    self.param("l_material", self.TypeLayer, "l_material", default = LayerInfo(0, 0))
+    self.param("l_metal", self.TypeLayer, "l_metal", default = LayerInfo(1, 0))
+    self.param("channel_width", self.TypeInt, "channel_width", default = 20)
+    self.param("tot_channel_length", self.TypeInt, "tot_channel_length", default = 100)
+    self.param("channel_lengths", self.TypeList, "channel_lengths", default = [40])
+    self.param("leg_width", self.TypeInt, "leg_width", default = 10)   
+    self.param("leg_length", self.TypeInt, "leg_length", default = 15)   
+    self.param("metal_over_material", self.TypeInt, "metal_over_material", default = 10) 
+    self.param("metal_over_material_side", self.TypeInt, "metal_over_material_side", default = 10)
+    self.param("direct_contact_length", self.TypeInt, "direct contact length beyond mat", default = 30)  
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Hall bar"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(Polygon(...))
+    channel_width = self.channel_width
+    tot_channel_length = self.tot_channel_length
+    leg_width = self.leg_width
+    leg_length = self.leg_length
+    metal_over_material = self.metal_over_material
+    metal_over_material_side = self.metal_over_material_side
+    direct_contact_length = self.direct_contact_length
+    
+    channel = DBox(Point(0, -channel_width/2), Point(tot_channel_length, channel_width/2))
+    self.cell.shapes(self.l_material_layer).insert(channel)
+    leg_y = leg_length + channel_width/2
+    con_in_y = leg_length + channel_width/2 - metal_over_material
+    con_out_y = leg_length + channel_width/2 + direct_contact_length
+    tot_ch_len = leg_width*(len(self.channel_lengths) + 1)
+    for ch in self.channel_lengths:
+      tot_ch_len += int(ch)
+    side_ch_len = (tot_channel_length - tot_ch_len)/2
+    leg_start = side_ch_len
+    for ch in self.channel_lengths:
+      self.cell.shapes(self.l_material_layer).insert(DBox(leg_start, -leg_y, leg_start + leg_width, leg_y))
+      self.cell.shapes(self.l_metal_layer).insert(DBox(leg_start - metal_over_material_side, con_in_y, leg_start + leg_width + metal_over_material_side, con_out_y))
+      leg_start += leg_width + int(ch)
+    self.cell.shapes(self.l_material_layer).insert(DBox(leg_start, -leg_y, leg_start + leg_width, leg_y))
+    self.cell.shapes(self.l_metal_layer).insert(DBox(leg_start - metal_over_material_side, con_in_y, leg_start + leg_width + metal_over_material_side, con_out_y))
+    metal_top_con = self.cell.shapes(self.l_metal_layer).dup()
+    self.cell.shapes(self.l_metal_layer).insert(metal_top_con, Trans.M0)
+    channel_left_con = DBox(-direct_contact_length, -channel_width/2 - metal_over_material_side, metal_over_material, channel_width/2 + metal_over_material_side)
+    channel_right_con = DBox(tot_channel_length - metal_over_material, -channel_width/2 - metal_over_material_side, tot_channel_length +direct_contact_length, channel_width/2 + metal_over_material_side)
+    self.cell.shapes(self.l_metal_layer).insert(channel_left_con)
+    self.cell.shapes(self.l_metal_layer).insert(channel_right_con)
+</text>
+</klayout-macro>

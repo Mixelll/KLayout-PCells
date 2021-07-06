@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import math
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Graphene_Schottky_2T_spiral(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Graphene_Schottky_2T_spiral, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("ID", self.TypeString, "ID", default = '') 
+    self.param("in_r", self.TypeDouble, "in_r", default = 100)
+    self.param("out_r", self.TypeDouble, "out_r", default = 300)
+    self.param("ox_width", self.TypeDouble, "ox_width", default = 7)
+    self.param("m1_width", self.TypeDouble, "m1_width", default = 5)
+    self.param("gr_width", self.TypeDouble, "gr_width", default = 5)
+    self.param("m1_beyond_ox", self.TypeDouble, "m1_beyond_ox", default = 1)
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default = 3)
+    self.param("N", self.TypeDouble, "N", default = 3)
+    
+    self.param("write_param_in_m1", self.TypeString, "write_param_in_m1", default = '')  
+    self.param("text_line_width", self.TypeDouble, "text_line_width", default = 3)
+    
+    self.param("lox", self.TypeLayer, "Oxide", default = pya.LayerInfo(0, 0))
+    self.param("lm1", self.TypeLayer, "M1", default = pya.LayerInfo(1, 0))
+    self.param("lgr", self.TypeLayer, "Graphene", default = pya.LayerInfo(2, 0))
+    self.param("lm2", self.TypeLayer, "M2", default = pya.LayerInfo(3, 0))
+    self.param("lt", self.TypeLayer, "Text", default = pya.LayerInfo(1, 0))
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Graphene Schottky 2T spiral"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+
+    nm2um =1000
+    
+    
+    in_r = nm2um*self.in_r
+    out_r = nm2um*self.out_r
+    ox_width = nm2um*self.ox_width 
+    m1_width = nm2um*self.m1_width
+    gr_width = nm2um*self.gr_width
+    m1_beyond_ox = nm2um*self.m1_beyond_ox
+    
+    def archimedean_spiral(rmax, r0, ang_p, N):
+      out = []
+      dtet = math.floor((rmax-r0)/ang_p) *2*math.pi/N
+      while i&lt;N:
+        i +=1
+        r = r0 + ang_p*dtet*i
+        out.append(pya.Point(r*cos(dtet*i), r*sin(dtet*i)))
+      return out
+    
+        
+    
+    
+    def find_minmax_in_seg(seg, mind, axis):
+      if axis=='x':
+        minmax = seg[0].x
+        for point in seg:
+          if mind and point.x&gt;minmax:
+            minmax = point.x
+          elif not mind and point.x&lt;minmax:
+            minmax = point.x
+      elif axis=='y':
+        minmax = seg[0].y
+        for point in seg:
+          if mind and point.y&gt;minmax:
+            minmax = point.y
+          elif not mind and point.y&lt;minmax:
+            minmax = point.y
+      return minmax
+          
+    
+    
+    
+    # #M2 (Grtaphene contact)
+    #right
+
+    ang_p = m1_width + gr_width
+    self.cell.shapes(self.lox_layer).insert(pya.Path(archimedean_spiral(out_r, in_r +(gr_width+m1_width)/2, ang_p, self.N), m1_width))
+    self.cell.shapes(self.lm1_layer).insert(pya.Path(archimedean_spiral(out_r, in_r +(gr_width+m1_width)/2, ang_p, self.N), m1_width +2*m1_beyond_ox))
+    self.cell.shapes(self.lgr_layer).insert(pya.Path(archimedean_spiral(out_r, in_r+ox_width +(gr_width+m1_width)/2, ang_p, self.N), gr_width))
+        
+    if len(self.write_param_in_m1)&gt;0:
+      pre_text_bbox = self.cell.bbox()
+      lay = pya.Layout()
+      text_layer = lay.layer(0, 0)
+      text_layer_info = pya.LayerInfo(0, 0)  
+      param_dict = self.cell.pcell_parameters_by_name()
+      param_dict_keys = param_dict.keys()
+      text = ''
+      for key in param_dict_keys:
+        if key in self.write_param_in_m1:
+          text = key + '=' + str(int(param_dict[key])) +'\n' + text
+      
+      text_param = {'text': text, 'layer': text_layer_info, 'mag': 10*self.text_line_width}
+      text_shapes = lay.create_cell("TEXT", "Basic", text_param).shapes(text_layer)
+#      text_bbox = lay.create_cell("TEXT", "Basic", text_param).bbox()
+      text_shapes.transform(pya.Trans(pre_text_bbox.left, pre_text_bbox.top + int(m_separation)))
+      self.cell.shapes(self.lt_layer).insert(text_shapes)
+    
+
+    
+
+      
+      
+</text>
+</klayout-macro>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from pya import *
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Nathan(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Nathan, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("layers", self.TypeList, "layers")
+    self.param("x", self.TypeDouble, "x", default = 100)
+    self.param("y", self.TypeDouble, "y", default = 100)
+    self.param("d", self.TypeDouble, "Thickness", default = 10)
+    self.param("length", self.TypeDouble, "Thickness", default = 10)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Nathan"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    x = self.x
+    y = self.y
+    d = self.d
+    double_length = 2*self.length
+    frame = DPolygon(DBox(DPoint(0, 0), DPoint(x, y)))
+    frame.insert_hole(DBox(DPoint(0, 0), DPoint(x-2*d, y-2*d)).transformed(DTrans(d,d)))
+    frame.transform(DTrans(-x/2, -y/2))
+    for l_string in self.layers:
+      l = self.layout.layer(int(l_string), 0)
+      self.cell.shapes(l).insert(frame)
+      x =55
+    print(x)</text>
+</klayout-macro>

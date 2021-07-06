@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import math
+from SiEPIC.utils import get_technology, get_technology_by_name
+
+# Import KLayout Python API methods:
+# Box, Point, Polygon, Text, Trans, LayerInfo, etc
+from pya import *
+
+
+class dor_MMI(PCellDeclarationHelper):
+  """
+  The PCell declaration for the strip waveguide taper.
+  """
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(dor_MMI, self).__init__()
+    TECHNOLOGY = get_technology_by_name('EBeam')
+
+    # declare the parameters
+    self.param("silayer", self.TypeLayer, "Si Layer", default = TECHNOLOGY['Si'])
+    self.param("height", self.TypeDouble, "Height", default = 7.65)
+    self.param("length", self.TypeDouble, "Length", default = 5)
+    self.param("left_top_wg_width", self.TypeDouble, "Top Left Waveguide Width", default = 0.5)
+    self.param("left_bot_wg_width", self.TypeDouble, "Bottom Left Waveguide Width", default = 0.5)
+    self.param("right_wg_width", self.TypeDouble, "Right Waveguide Width", default = 0.5)
+    self.param("left_wg_sep", self.TypeDouble, "Separation of Left Waveguides Centers", default = 1.7)
+    self.param("pinrec", self.TypeLayer, "PinRec Layer", default = TECHNOLOGY['PinRec'])
+    self.param("devrec", self.TypeLayer, "DevRec Layer", default = TECHNOLOGY['DevRec'])
+    # hidden parameters, can be used to query this component:
+    self.param("p1", self.TypeShape, "DPoint location of pin1", default = Point(-10000, 0), hidden = True, readonly = True)
+    self.param("p2", self.TypeShape, "DPoint location of pin2", default = Point(0, 10000), hidden = True, readonly = True)
+    
+
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "dor_GC(Height=" + ('%.3f Length=%.3f top_left_wg=%.3f bot_left_wg=%.3f right_wg=%.3f left_wg_sep=%.3f' % (self.height,self.length,self.left_top_wg_width,self.left_bot_wg_width,self.right_wg_width,self.left_wg_sep) ) + ")"
+
+  def can_create_from_shape_impl(self):
+    return False
+
+
+  def produce(self, layout, layers, parameters, cell):
+    """
+    coerce parameters (make consistent)
+    """
+    self._layers = layers
+    self.cell = cell
+    self._param_values = parameters
+    self.layout = layout
+    shapes = self.cell.shapes
+
+
+    # cell: layout cell to place the layout
+    # LayerSiN: which layer to use
+    # w: waveguide width
+    # length units in dbu
+
+    # fetch the parameters
+    dbu = self.layout.dbu
+    ly = self.layout
+    
+    LayerSi = self.silayer
+    LayerSiN = self.silayer_layer
+    LayerPinRecN = ly.layer(self.pinrec)
+    LayerDevRecN = ly.layer(self.devrec)
+    
+    w1 = int(round(self.left_top_wg_width/dbu))
+    w2 = int(round(self.left_bot_wg_width/dbu))
+    w3 = int(round(self.right_wg_width/dbu))
+    length = int(round(self.length/dbu))
+    h = int(round(self.height/dbu))
+    s = int(round(self.left_wg_sep/dbu))
+    
+
+    shapes(LayerSiN).insert(Box(0, -h/2, length, h/2))
+      
+
+    
+    # Create the pins on the waveguides, as short paths:
+    from SiEPIC._globals import PIN_LENGTH as pin_length
+    
+    # Pin on the left side:
+    p1 = [Point(pin_length/2,s/2), Point(-pin_length/2,s/2)]
+    p1c = Point(0,s/2)
+    self.set_p1 = p1c
+    self.p1 = p1c
+    pin = Path(p1, w1)
+    shapes(LayerPinRecN).insert(pin)
+    t = Trans(Trans.R0, 0, s/2)
+    text = Text ("pin1", t)
+    shape = shapes(LayerPinRecN).insert(text)
+    shape.text_size = 0.4/dbu
+    
+    p2 = [Point(pin_length/2,-s/2), Point(-pin_length/2,-s/2)]
+    p2c = Point(0,-s/2)
+    self.set_p2 = p1c
+    self.p2 = p1c
+    pin = Path(p2, w2)
+    shapes(LayerPinRecN).insert(pin)
+    t = Trans(Trans.R0, 0, -s/2)
+    text = Text ("pin2", t)
+    shape = shapes(LayerPinRecN).insert(text)
+    shape.text_size = 0.4/dbu
+    
+    p3 = [Point(length-pin_length/2,0), Point(length+pin_length/2,0)]
+    p3c = Point(length, 0)
+    self.set_p3 = p3c
+    self.p3 = p3c
+    pin = Path(p3, w3)
+    shapes(LayerPinRecN).insert(pin)
+    t = Trans(Trans.R0, length, 0)
+    text = Text ("pin3", t)
+    shape = shapes(LayerPinRecN).insert(text)
+    shape.text_size = 0.4/dbu
+
+    #return "ebeam_taper_te1550(" + ('%.3f-%.3f-%.3f' % (self.width,self.period,self.length) ) + ")"</text>
+</klayout-macro>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+class General_Dialog(pya.QDialog):
+  def __init__(self, func, options = None):
+    super(General_Dialog, self).__init__()
+    self.func = func
+    name = str(self.func)
+    if options is None:
+      options = self.func()
+    
+    self.setWindowTitle(name)
+    mainLayout = pya.QVBoxLayout(self)
+    self.setLayout(mainLayout)
+    paramsLayout = pya.QVBoxLayout(self);
+    self.qtext=[]
+    self.qlabel=[]
+    for t in options:
+      paramLayout = pya.QHBoxLayout(self);
+      self.qlabel.append ( pya.QLabel(t,self) )
+      self.qtext.append ( pya.QLineEdit(self) )
+      self.qtext[-1].fieldtype = type(options[t])
+      self.qtext[-1].text = str(options[t])
+      paramLayout.addWidget(self.qlabel[-1])
+      paramLayout.addWidget(self.qtext[-1])
+      paramsLayout.addLayout(paramLayout)
+
+    buttonsLayout = pya.QHBoxLayout(self);
+    ok = pya.QPushButton("OK",self)
+    ok.clicked(self.ok)
+    cancel = pya.QPushButton("Cancel",self)
+    cancel.clicked(self.cancel)
+    buttonsLayout.addWidget(cancel)
+    buttonsLayout.addWidget(ok)
+
+    mainLayout.addLayout(paramsLayout)
+    mainLayout.addLayout(buttonsLayout)
+
+  def ok(self, val):
+    self.close()
+    options = {}
+    for i in range(0,len(self.qlabel)):
+      if self.qtext[i].fieldtype == float:
+        options[self.qlabel[i].text]=float(self.qtext[i].text)
+      elif self.qtext[i].fieldtype == int:
+        options[self.qlabel[i].text]=int(self.qtext[i].text)
+      elif self.qtext[i].fieldtype == list:
+        options[self.qlabel[i].text]=self.qtext[i].text.strip('][').split(',')
+      else:
+        options[self.qlabel[i].text]=self.qtext[i].text
+    self.func(options)
+    return options
+    #execute(name(options))
+  def cancel(self, val):
+    self.close()
+      
+    
+    
+#GUI = General_Dialog(pya.Application.instance().main_window(), func =Negative_ebeam_script)
+#GUI.show()
+</text>
+</klayout-macro>

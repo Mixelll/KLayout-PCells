@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class Hall_bar_defunct(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(Hall_bar_defunct, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    # declare the parameters
+    self.param("l_material", self.TypeLayer, "l_material", default = pya.LayerInfo(0, 0))
+    self.param("l_metal", self.TypeLayer, "l_metal", default = pya.LayerInfo(1, 0))
+    self.param("horizontal_channel_width", self.TypeInt, "horizontal_channel_width", default = 100)
+    self.param("horizontal_channel_center_length", self.TypeInt, "horizontal_channel_center_length", default = 1000)
+    self.param("horizontal_channel_side_length", self.TypeInt, "horizontal_channel_side_length", default = 100)   
+    self.param("vertical_channel_width", self.TypeInt, "vertical_channel_width", default = 100)   
+    self.param("vertical_channel_length", self.TypeInt, "vertical_channel_length", default = 100)   
+    self.param("contact_size_1", self.TypeInt, "contact_size_1", default = 100) 
+    self.param("contact_size_2", self.TypeInt, "contact_size_2", default = 500) 
+
+    self.param("metal_over_material", self.TypeInt, "metal_over_material", default = 10) 
+    
+    self.param("write_param_in_m1", self.TypeString, "write_param_in_m1", default = '')  
+    self.param("text_line_width", self.TypeInt, "text_line_width", default = 3)
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Hall bar defunct"
+  
+  def coerce_parameters_impl(self):
+    pass
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    
+    mir_x = pya.Trans.M90
+    mir_y = pya.Trans.M0
+    rot90 = pya.Trans.R90
+    p_1 = pya.Point(-(self.horizontal_channel_side_length + self.vertical_channel_width + self.horizontal_channel_center_length/2), 0)
+    p_2 = pya.Point(-(self.horizontal_channel_side_length + self.vertical_channel_width + self.horizontal_channel_center_length/2), self.horizontal_channel_width/2)
+    p_3 = pya.Point(-(self.vertical_channel_width + self.horizontal_channel_center_length/2), self.horizontal_channel_width/2)
+    p_4 = pya.Point(-(self.vertical_channel_width + self.horizontal_channel_center_length/2), self.horizontal_channel_width/2 + self.vertical_channel_length)
+    p_5 = pya.Point(-(self.horizontal_channel_center_length/2), self.horizontal_channel_width/2 + self.vertical_channel_length)
+    p_6 = pya.Point(-(self.horizontal_channel_center_length/2), self.horizontal_channel_width/2)
+    p_7 = pya.Point(0, self.horizontal_channel_width/2)
+    p_8 = pya.Point(0, 0)
+    mat_quarter_polygon = pya.Polygon([p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8], False)
+    self.cell.shapes(self.l_material_layer).insert(mat_quarter_polygon) 
+    self.cell.shapes(self.l_material_layer).insert(mat_quarter_polygon.transform(mir_x))
+    material_half_shapes = self.cell.shapes(self.l_material_layer).dup()
+    self.cell.shapes(self.l_material_layer).insert(material_half_shapes, mir_y)
+    
+    contact = pya.Box(pya.Point(0,0), pya.Point(self.contact_size_1, self.contact_size_2))
+    contact_horz_left = contact.transformed(pya.Trans(-(self.contact_size_1 + self.horizontal_channel_side_length + self.vertical_channel_width + self.horizontal_channel_center_length/2 - self.metal_over_material), -int(self.contact_size_2/2)))
+    contact_vert_top_left = contact.transformed(rot90)
+    contact_vert_top_left = contact_vert_top_left.transformed(pya.Trans(-(-self.contact_size_2/2  + self.horizontal_channel_center_length/2 +  self.vertical_channel_width/2), int(self.vertical_channel_length + self.horizontal_channel_width/2 - self.metal_over_material)))
+    self.cell.shapes(self.l_metal_layer).insert(contact_horz_left)
+    self.cell.shapes(self.l_metal_layer).insert(contact_vert_top_left)
+    
+    metal_half_shapes = self.cell.shapes(self.l_metal_layer).dup()
+    self.cell.shapes(self.l_material_layer).insert(material_half_shapes, mir_x)
+    metal_half_shapes = self.cell.shapes(self.l_metal_layer).dup()
+    self.cell.shapes(self.l_material_layer).insert(material_half_shapes, mir_y)  
+</text>
+</klayout-macro>
